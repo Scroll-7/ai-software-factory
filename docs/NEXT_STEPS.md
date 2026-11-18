@@ -41,9 +41,26 @@ docker exec -it pfe-pg psql -U pfe -d pfe_factory -c "CREATE EXTENSION IF NOT EX
 
 Résultat réel : conteneur `pfe-pg` **Up**, `pg_isready` OK, `vector | 0.8.7`. Rien à refaire.
 
-## Étape 8 — Télécharger les modèles locaux
+## Étape 8 — Télécharger les modèles locaux ✅ TAGS VÉRIFIÉS (2026-11-18)
 
-**NE PAS encore choisir au hasard.** Dis-moi quand tu es à cette étape : je te donnerai 2 ou 3 tags exacts à vérifier (un embedding français et un LLM 7B coder en Q4_K_M). Je te dirai aussi quelle dimension mettre dans `vector(<dim>)`.
+```powershell
+ollama pull bge-m3
+ollama pull qwen2.5-coder:7b
+```
+
+Sources vérifiées : `ollama.com/library/bge-m3` (567M, 8K, 100+ langues) et
+`ollama.com/library/qwen2.5-coder:7b` (Q4_K_M, 4,7 Go). Dimension BGE-M3 = **1024**
+(fiche officielle BAAI/bge-m3) → `vector(1024)` déjà écrit dans `schema.sql`.
+
+Repli si la machine manque de mémoire : `ollama pull qwen2.5-coder:3b` (Q4_K_M, 1,9 Go).
+
+Après le téléchargement, vérifie :
+
+```powershell
+ollama list
+```
+
+Attendu : les lignes `bge-m3` et `qwen2.5-coder:7b`.
 
 ## Étape 9 — Premier lancement
 

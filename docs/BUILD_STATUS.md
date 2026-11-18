@@ -11,7 +11,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - Cible CV : **`demo-hr-app/`** (Angular + TypeScript + Spring Boot), CV fictifs **français uniquement**.
 - Plan de contrôle : Java 21 + Spring Boot + Spring AI, Angular UI, FastAPI RAG, PostgreSQL + pgvector, Ollama local.
 - RAG : corpus **synthétique** français, hibryde cosine + `tsvector('french')`.
-- Modèles : 7B-Q4 par défaut (8 Go VRAM), repli 3B-Q4 ; embedding français chargé uniquement à l'ingestion.
+- Modèles (vérifiés 2026-11-18) : `qwen2.5-coder:7b` Q4_K_M par défaut, repli `qwen2.5-coder:3b` Q4_K_M ; embedding `bge-m3` (1024 dims, multilingue FR) chargé uniquement à l'ingestion.
 - Prompts : français, versionnés `v1`, identifiants de code en anglais.
 - Aucun service externe, aucune télémétrie, aucune donnée confidentielle.
 
@@ -25,8 +25,8 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 | `java` 21.0.13 | ✅ installé (JDK 17 conservé aussi) | — |
 | `maven` 3.10.1 | ✅ installé (via Chocolatey) | — |
 | `docker` 29.9.3 | ✅ installé (Virtual Machine Platform + WSL activés, redémarrage fait) | — |
-| `ollama` | ❌ absent | **TOI** : installer Ollama |
-| poids des modèles | ❌ non téléchargés | **TOI** : `ollama pull <tag vérifié>` |
+| `ollama` 0.40.16 | ✅ installé (`ollama --version` confirmé) | — |
+| poids des modèles | ❌ non téléchargés | **TOI** : `ollama pull qwen2.5-coder:7b` et `ollama pull bge-m3` |
 | PostgreSQL + pgvector | ✅ conteneur `pfe-pg` (pgvector **0.8.7**) sur `localhost:5432`, base `pfe_factory`, user `pfe` | — |
 | Token GitHub | ❌ non fourni (push fait via Credential Manager) | **TOI** : PAT fin-grained uniquement si besoin API, jamais commité |
 
@@ -37,6 +37,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - Versions vérifiées sur Maven Central, pas inventées. `spring-ai-starter-model-ollama` est le nom correct (l'ancien `-ollama-spring-boot-starter` n'existe plus en 1.0.x).
 - Dépôt GitHub `Scroll-7/ai-software-factory` créé et pushé sur `master` (2 commits, arbre propre).
 - `docker run -d --name pfe-pg ... pgvector/pgvector:pg16` → conteneur **Up**, `pg_isready` OK, `CREATE EXTENSION vector` → **0.8.7**. `pgcrypto` sera créé par `schema.sql` au 1er démarrage de l'API.
+- Tags et dimension vérifiés sur ollama.com/library et la fiche officielle BAAI/bge-m3 : `qwen2.5-coder:7b` = Q4_K_M 4,7 Go ; `bge-m3` = 1024 dims. `vector(1024)` écrit dans `schema.sql` **avant** toute insertion.
 
 ## Lots de construction
 

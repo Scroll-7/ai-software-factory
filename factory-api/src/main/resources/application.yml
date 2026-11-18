@@ -13,18 +13,19 @@ spring:
       schema-locations: classpath:schema.sql
       continue-on-error: false
 
-  # Propriétés Spring AI 1.0.x vérifiées. Seuls les TAGS de modèles restent à VERIFY
-  # (ils dépendent des poids que TU téléchargeras — voir docs/models.md).
+  # Propriétés Spring AI 1.0.x vérifiées. Tags vérifiés le 2026-11-18 :
+  # qwen2.5-coder:7b = Q4_K_M (4,7 Go) ; bge-m3 = 1024 dimensions, multilingue FR.
+  # Le repli 3B est qwen2.5-coder:3b (Q4_K_M, 1,9 Go).
   ai:
     ollama:
       base-url: ${PFE_OLLAMA_URL:http://localhost:11434}
       chat:
         options:
-          model: VERIFY_7B_MODEL_TAG
+          model: qwen2.5-coder:7b
           temperature: 0.0
       embedding:
         options:
-          model: VERIFY_EMBEDDING_MODEL_TAG
+          model: bge-m3
 
 server:
   port: 8080

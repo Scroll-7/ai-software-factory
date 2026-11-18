@@ -2,9 +2,9 @@
 
 ## Écrit et utilisable après installation
 
-- `factory-api/pom.xml` — **contient 3 placeholders à remplacer** : `VERIFY_SPRING_BOOT_VERSION`, `VERIFY_SPRING_AI_VERSION`, `VERIFY_JJWT_VERSION`.
-- `factory-api/src/main/resources/application.yml` — **contient des placeholders** : `VERIFY_7B_MODEL_TAG`, `VERIFY_EMBEDDING_MODEL_TAG`, `VERIFY_LOCAL_JWT_SECRET_AT_LEAST_256_BITS`. Vérifie aussi les noms de propriétés Spring AI.
-- `schema.sql` — schéma complet, idempotent, `tsvector('french')`, `vector(768)` **à ajuster selon la dimension réelle de ton embedding**.
+- `factory-api/pom.xml` — versions **vérifiées et figées** : Spring Boot 3.5.16, Spring AI 1.0.9, JJWT 0.12.6 (plus de placeholder).
+- `factory-api/src/main/resources/application.yml` — modèles **vérifiés le 2026-11-18** : `qwen2.5-coder:7b` (Q4_K_M) et `bge-m3`. Le secret JWT reste une valeur de dev à remplacer par une clé locale aléatoire.
+- `schema.sql` — schéma complet, idempotent, `tsvector('french')`, `vector(1024)` (dimension **vérifiée** de BGE-M3).
 - `schemas/*.v1.json` — 5 schémas de sortie (Specs, Design, Code, Tests, Review).
 - `prompts/v1/*.fr.txt` — prompt commun + 5 prompts spécifiques, français, versionnés.
 - Java : orchestrateur, validateur JSON minimal, validateur métier, normaliseur d'erreurs, audit à chaîne de hachage, repository JDBC, REST minimal, JWT (API JJWT à vérifier).
@@ -22,12 +22,13 @@ Conséquence : **l'orchestrateur compile (si versions correctes) mais ne peut pa
 
 ## À vérifier avant le premier build
 
-1. Remplacer les placeholders de version dans `pom.xml` et `application.yml`.
-2. Installer JDK 21 (`java -version` doit afficher 21).
-3. Remplacer `vector(768)` par la vraie dimension de l'embedding choisi.
-4. Vérifier les noms exacts des classes Spring AI (`ChatModel`, `Prompt`) et de l'artefact Ollama.
-5. Vérifier l'API JJWT (`Jwts.parser().verifyWith(...)` est supposée ici).
-6. Lancer `mvn -q -DskipTests compile` et me renvoyer la sortie.
+1. ✅ Fait — versions vérifiées (Maven Central) et figées dans `pom.xml`.
+2. ✅ Fait — JDK 21 installé (`java -version` → 21.0.13).
+3. ✅ Fait — dimension figée à 1024 (BGE-M3), avant toute insertion.
+4. ✅ Fait — artefact `spring-ai-starter-model-ollama` vérifié ; noms des classes confirmés par la compilation.
+5. ✅ Fait — API JJWT confirmée par la compilation.
+6. ✅ Fait — `mvn -q -DskipTests compile` → BUILD SUCCESS.
+7. Reste à faire par toi : `ollama pull qwen2.5-coder:7b` et `ollama pull bge-m3`.
 
 ## Choix d'architecture pris dans ce lot
 

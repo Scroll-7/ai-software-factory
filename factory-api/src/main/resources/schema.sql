@@ -1,7 +1,8 @@
 -- Schéma idempotent pour le prototype local.
--- VERIFIER: nom de l'opclass HNSW et dimension de l'embedding avant la 1re ingestion.
--- ASSUMPTION: 768 dimensions. Si ton embedding fait 384, REMPLACE vector(768) par vector(384)
--- AVANT le premier INSERT dans rag_chunk (changer ensuite impose un re-embedding).
+-- VERIFIER: nom de l'opclass HNSW avant la 1re ingestion.
+-- Dimension VERIFIEE le 2026-11-18 : BGE-M3 (ollama `bge-m3`) produit 1024 dimensions
+-- (source : fiche officielle BAAI/bge-m3). Ne PAS changer après le premier INSERT :
+-- cela imposerait un re-embedding complet.
 
 CREATE EXTENSION IF NOT EXISTS vector;
 CREATE EXTENSION IF NOT EXISTS pgcrypto;
@@ -207,7 +208,7 @@ CREATE TABLE IF NOT EXISTS rag_chunk (
   token_count integer NOT NULL,
   metadata    jsonb NOT NULL DEFAULT '{}'::jsonb,
   content_tsv tsvector GENERATED ALWAYS AS (to_tsvector('french', content)) STORED,
-  embedding   vector(768) NOT NULL,
+  embedding   vector(1024) NOT NULL,
   created_at  timestamptz NOT NULL DEFAULT now(),
   UNIQUE (document_id, ordinal)
 );
