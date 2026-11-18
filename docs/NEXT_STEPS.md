@@ -24,13 +24,9 @@ Attendu : un numéro de version. Si « not recognized », redémarrePowerShell a
 ollama --version
 ```
 
-## Étape 6 — Installer le driver PostgreSQL Python
+## Étape 6 — Installer le driver PostgreSQL Python ✅ FAIT (2026-11-19)
 
-```powershell
-python -m pip install "psycopg[binary]"
-```
-
-Si ça échoue à cause de Python 3.14, dis-moi — on utilisera une version précise.
+`python -m pip install "psycopg[binary]"` → **psycopg 3.3.9** vérifié par import.
 
 ## Étape 7 — Démarrer PostgreSQL + pgvector ✅ FAIT (2026-11-18)
 
@@ -40,6 +36,8 @@ docker exec -it pfe-pg psql -U pfe -d pfe_factory -c "CREATE EXTENSION IF NOT EX
 ```
 
 Résultat réel : conteneur `pfe-pg` **Up**, `pg_isready` OK, `vector | 0.8.7`. Rien à refaire.
+
+Schéma appliqué le 2026-11-19 via `Get-Content -Raw schema.sql | docker exec -i pfe-pg psql ... -v ON_ERROR_STOP=1 -f -`. Vérifié : `rag_chunk.embedding` = `vector(1024)`.
 
 ## Étape 8 — Télécharger les modèles locaux ✅ FAIT (2026-11-19)
 
@@ -66,9 +64,11 @@ ollama list
 
 Attendu : les lignes `bge-m3` et `qwen2.5-coder:7b`.
 
-## Étape 9 — Premier lancement
+## Étape 9 — Premier lancement (en cours)
 
-Quand tout est vert, je te donnerai les commandes pour démarrer le RAG service et l'API, puis on testera une requête complète.
+✅ RAG service démarré et corpus ingéré (6 documents / 20 chunks, recherche française OK).
+
+Reste avant la requête complète TC-01 : implémenter les Lots 3–4 (RepoClient, CheckClient Docker `--network none`, ScmClient Draft PR) et seeder `app_user` + `model_config`. Le bouchon `RagClient` sera remplacé par l'appel réel à `/context/build`.
 
 ---
 

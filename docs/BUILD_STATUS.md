@@ -20,7 +20,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 | Outil | État | Action requise |
 |---|---|---|
 | `git` | ✅ présent | — |
-| `python` 3.14 | ✅ présent (FastAPI 0.138, uvicorn 0.49, pydantic 2.12, numpy 2.4, torch CPU, transformers 5.12) | installer `psycopg[binary]` plus tard |
+| `python` 3.14 | ✅ présent (FastAPI 0.138, uvicorn 0.49, pydantic 2.12, numpy 2.4, psycopg **3.3.9**) | — |
 | `node` 24 / `npm` 11 | ✅ présents | — |
 | `java` 21.0.13 | ✅ installé (JDK 17 conservé aussi) | — |
 | `maven` 3.10.1 | ✅ installé (via Chocolatey) | — |
@@ -39,6 +39,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `docker run -d --name pfe-pg ... pgvector/pgvector:pg16` → conteneur **Up**, `pg_isready` OK, `CREATE EXTENSION vector` → **0.8.7**. `pgcrypto` sera créé par `schema.sql` au 1er démarrage de l'API.
 - Tags et dimension vérifiés sur ollama.com/library et la fiche officielle BAAI/bge-m3 : `qwen2.5-coder:7b` = Q4_K_M 4,7 Go ; `bge-m3` = 1024 dims. `vector(1024)` écrit dans `schema.sql` **avant** toute insertion.
 - Vérification réelle locale (2026-11-19) : `POST /api/embed` avec `model: "bge-m3"` → `model=bge-m3`, `count=1024`. L'alias court `bge-m3` résout bien `bge-m3:latest`. Dimension confirmée, pas de re-embedding nécessaire.
+- **Premier RAG réel (2026-11-19)** : schéma appliqué via `psql -f schema.sql` → `vector(1024)`. Service `uvicorn app.main:app --port 8000` démarré, `/health` vert. `python bin/ingest_corpus.py` → **6 documents / 20 chunks**, tous `vector_dims=1024`. `/search` avec une requête française renvoie `synthetic://standards/i18n.md` en tête. `/context/build` répond avec les clés `targetApp, tree, files, testCommands, tokenCount, note`.
 
 ## Lots de construction
 
