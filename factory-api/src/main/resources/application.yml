@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: factory-api
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/pfe_factory
+    username: pfe
+    password: pfe
+
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      continue-on-error: false
+
+  # Propriétés Spring AI 1.0.x vérifiées. Seuls les TAGS de modèles restent à VERIFY
+  # (ils dépendent des poids que TU téléchargeras — voir docs/models.md).
+  ai:
+    ollama:
+      base-url: ${PFE_OLLAMA_URL:http://localhost:11434}
+      chat:
+        options:
+          model: VERIFY_7B_MODEL_TAG
+          temperature: 0.0
+      embedding:
+        options:
+          model: VERIFY_EMBEDDING_MODEL_TAG
+
+server:
+  port: 8080
+
+factory:
+  prompts:
+    version: v1
+  limits:
+    # CODE a droit à 3 tentatives, les autres à 2 (voir Part 2).
+    max-attempts:
+      SPECS: 2
+      DESIGN: 2
+      CODE: 3
+      TESTS: 2
+      REVIEW: 2
+    max-repairs-per-run: 4
+    llm-timeout-seconds: 120
+  scm:
+    default-repo: Scroll-7/ai-software-factory
+    fake-exposer-repo: Scroll-7/Fake-exposer
+  rag:
+    base-url: http://localhost:8000
+  telemetry:
+    enabled: false
+
+security:
+  jwt:
+    # VERIFY: générer une clé locale aléatoire, ne jamais committer la vraie valeur.
+    secret: ${PFE_JWT_SECRET:local-dev-only-key-change-me-0123456789abcdef}
+    expiry-seconds: 3600
+
+# Aucun Actuator exporter, aucun service externe, aucune télémétrie.

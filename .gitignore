@@ -1,0 +1,47 @@
+# IDE / OS
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Java / Maven
+target/
+*.class
+.mvn/timing.properties
+
+# Node / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+npm-debug.log*
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+
+# Secrets et environnements — NEVER commit
+.env
+.env.*
+!.env.example
+*.token
+~/.git-credentials
+
+# Données de travail / modèles / clones
+workspaces/
+models/
+*.gguf
+known_faces/
+*.pkl
+*.onnx
+
+# Ollama / Docker locaux
+.ollama/
+docker-data/
+
+# Résultats bruts volumineux
+evaluation/results/raw/

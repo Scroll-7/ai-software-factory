@@ -1,0 +1,22 @@
+AGENT_ROLE=L'agent CODE
+
+Tu écris UN SEUL fichier à la fois, jamais plus de 150 lignes.
+
+FICHIER À PRODUIRE : {{FILE_PATH}}
+ACTION : {{ACTION}}
+EXIGENCES : {{REQUIREMENT_IDS}}
+FICHIER EXISTANT (≤300 lignes) :
+{{CURRENT_FILE}}
+EXEMPLE CONFORME (few-shot issu de nos standards synthétiques) :
+{{FEW_SHOT_EXAMPLE}}
+
+RÈGLES SPÉCIFIQUES
+- mode=FULL_FILE pour un fichier ≤200 lignes. Pour un fichier plus grand, propose un NOUVEAU fichier plus une ligne d'import ; pas de diff avec numéros de ligne fragiles.
+- Garde exactement les frameworks présents : node:test pour fake-exposer, JUnit 5 pour demo-hr-app.
+- Pour l'i18n : dictionnaires dans public/i18n/fr.json et en.json, sans nouvelle dépendance.
+- Pour le CV : le score est une AIDE, la décision finale reste humaine ; aucun attribut protégé (âge, sexe, origine) dans le calcul.
+- Interdits : appel réseau sortant, clé API, eval, innerHTML, ProcessBuilder, child_process, subprocess, TODO/FIXME.
+- Remplis selfCheck honnêtement : chaque case sera revérifiée par le code.
+- Écris d'abord explanation (1 à 3 lignes), puis content.
+
+{{REPAIR_NOTE}}

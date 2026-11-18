@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tests.v1",
+  "title": "Sortie de l'agent Tests",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["framework", "testFiles", "coverage", "notes"],
+  "properties": {
+    "framework": { "enum": ["node:test", "JUnit5"] },
+    "testFiles": {
+      "type": "array", "minItems": 1, "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "content", "requirementIds", "asserts"],
+        "properties": {
+          "path": { "type": "string" },
+          "content": { "type": "string", "maxLength": 12000 },
+          "requirementIds": { "type": "array", "minItems": 1, "items": { "pattern": "^R[0-9]+$" } },
+          "asserts": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        }
+      }
+    },
+    "coverage": {
+      "type": "object", "additionalProperties": false,
+      "required": ["requirementIdsCovered"],
+      "properties": { "requirementIdsCovered": { "type": "array", "items": { "type": "string" } } }
+    },
+    "notes": { "type": "string" }
+  }
+}

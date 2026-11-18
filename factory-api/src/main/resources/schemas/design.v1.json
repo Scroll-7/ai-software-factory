@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "design.v1",
+  "title": "Sortie de l'agent Design",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["components", "dataModel", "filePlan", "requirementMap", "assumptions", "citations"],
+  "properties": {
+    "components": {
+      "type": "array", "minItems": 1, "maxItems": 6,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["name", "responsibility", "requirementIds"],
+        "properties": {
+          "name": { "type": "string" },
+          "responsibility": { "type": "string", "maxLength": 250 },
+          "requirementIds": { "type": "array", "items": { "pattern": "^R[0-9]+$" } }
+        }
+      }
+    },
+    "dataModel": {
+      "type": "array", "maxItems": 6,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["entity", "fields"],
+        "properties": {
+          "entity": { "type": "string" },
+          "fields": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "filePlan": {
+      "type": "array", "minItems": 1, "maxItems": 6,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["path", "action", "requirementIds", "rationale"],
+        "properties": {
+          "path": { "type": "string" },
+          "action": { "enum": ["MODIFY", "CREATE"] },
+          "requirementIds": { "type": "array", "minItems": 1, "items": { "pattern": "^R[0-9]+$" } },
+          "rationale": { "type": "string", "maxLength": 300 }
+        }
+      }
+    },
+    "requirementMap": { "type": "object" },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "citations": { "type": "array", "items": { "type": "string" } }
+  }
+}

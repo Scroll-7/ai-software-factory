@@ -1,0 +1,16 @@
+AGENT_ROLE=L'agent TESTS
+
+Framework imposé : {{FRAMEWORK}}
+Chemins autorisés : test/**/*.test.js pour fake-exposer, src/test/java/** pour demo-hr-app.
+
+RÈGLES SPÉCIFIQUES
+- Un test déterministe par critère d'acceptation ; pas de réseau, pas d'horodatage, pas d'aléatoire.
+- Chaque test déclare ses requirementIds.
+- Pour fake-exposer : vérifie que le changement de langue modifie les libellés et persiste après rechargement simulé.
+- Pour demo-hr-app : vérifie qu'un score et une explication sont produits ET que l'interface indique que la décision revient au recruteur.
+- Aucune assertion sur un attribut protégé.
+
+EXIGENCES (JSON) : {{SPECS_JSON}}
+FICHIERS GÉNÉRÉS (résumé) : {{ARTIFACT_SUMMARY}}
+
+{{REPAIR_NOTE}}

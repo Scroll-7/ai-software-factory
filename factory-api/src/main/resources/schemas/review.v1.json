@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.v1",
+  "title": "Sortie de l'agent Review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "findings", "traceability", "externalCalls", "biasChecklist", "summary"],
+  "properties": {
+    "decision": { "enum": ["APPROVE", "CHANGES_REQUESTED", "REJECT"] },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["severity", "message", "filePath", "line", "requirementId"],
+        "properties": {
+          "severity": { "enum": ["BLOCKER", "MAJOR", "MINOR"] },
+          "message": { "type": "string", "minLength": 10 },
+          "filePath": { "type": "string" },
+          "line": { "type": "integer", "minimum": 1 },
+          "requirementId": { "pattern": "^R[0-9]+$" }
+        }
+      }
+    },
+    "traceability": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["requirementId", "covered", "filePaths"],
+        "properties": {
+          "requirementId": { "pattern": "^R[0-9]+$" },
+          "covered": { "type": "boolean" },
+          "filePaths": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "externalCalls": { "type": "array", "maxItems": 0 },
+    "biasChecklist": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "scoreNotDecision": { "type": "boolean" },
+        "explanationProvided": { "type": "boolean" },
+        "noProtectedAttributes": { "type": "boolean" },
+        "humanReviewStated": { "type": "boolean" }
+      }
+    },
+    "summary": { "type": "string", "maxLength": 800 }
+  }
+}

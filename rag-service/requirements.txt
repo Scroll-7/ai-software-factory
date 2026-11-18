@@ -1,0 +1,9 @@
+# Déjà présents sur la machine de aziza (2026-11-18) :
+#   fastapi==0.138.0
+#   uvicorn==0.49.0
+#   pydantic==2.12.5
+#   numpy==2.4.2
+# À AJOUTER — VERIFY la compatibilité Python 3.14 et les versions exactes :
+psycopg[binary]>=3.2          # VERIFY: wheel Python 3.14 disponible
+# httpx n'est pas nécessaire : les appels Ollama utilisent urllib (stdlib).
+# sentence-transformers n'est pas nécessaire : embedding via Ollama local.
