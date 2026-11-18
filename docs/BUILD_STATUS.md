@@ -26,7 +26,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 | `maven` 3.10.1 | ✅ installé (via Chocolatey) | — |
 | `docker` 29.9.3 | ✅ installé (Virtual Machine Platform + WSL activés, redémarrage fait) | — |
 | `ollama` 0.40.16 | ✅ installé (`ollama --version` confirmé) | — |
-| poids des modèles | ❌ non téléchargés | **TOI** : `ollama pull qwen2.5-coder:7b` et `ollama pull bge-m3` |
+| poids des modèles | ✅ `qwen2.5-coder:7b` (4,7 Go) et `bge-m3:latest` (1,2 Go) téléchargés | — |
 | PostgreSQL + pgvector | ✅ conteneur `pfe-pg` (pgvector **0.8.7**) sur `localhost:5432`, base `pfe_factory`, user `pfe` | — |
 | Token GitHub | ❌ non fourni (push fait via Credential Manager) | **TOI** : PAT fin-grained uniquement si besoin API, jamais commité |
 
@@ -38,6 +38,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - Dépôt GitHub `Scroll-7/ai-software-factory` créé et pushé sur `master` (2 commits, arbre propre).
 - `docker run -d --name pfe-pg ... pgvector/pgvector:pg16` → conteneur **Up**, `pg_isready` OK, `CREATE EXTENSION vector` → **0.8.7**. `pgcrypto` sera créé par `schema.sql` au 1er démarrage de l'API.
 - Tags et dimension vérifiés sur ollama.com/library et la fiche officielle BAAI/bge-m3 : `qwen2.5-coder:7b` = Q4_K_M 4,7 Go ; `bge-m3` = 1024 dims. `vector(1024)` écrit dans `schema.sql` **avant** toute insertion.
+- Vérification réelle locale (2026-11-19) : `POST /api/embed` avec `model: "bge-m3"` → `model=bge-m3`, `count=1024`. L'alias court `bge-m3` résout bien `bge-m3:latest`. Dimension confirmée, pas de re-embedding nécessaire.
 
 ## Lots de construction
 

@@ -41,7 +41,11 @@ docker exec -it pfe-pg psql -U pfe -d pfe_factory -c "CREATE EXTENSION IF NOT EX
 
 Résultat réel : conteneur `pfe-pg` **Up**, `pg_isready` OK, `vector | 0.8.7`. Rien à refaire.
 
-## Étape 8 — Télécharger les modèles locaux ✅ TAGS VÉRIFIÉS (2026-11-18)
+## Étape 8 — Télécharger les modèles locaux ✅ FAIT (2026-11-19)
+
+`ollama list` → `qwen2.5-coder:7b` (4,7 Go) et `bge-m3:latest` (1,2 Go).
+Vérification réelle : `POST http://localhost:11434/api/embed` avec `model: "bge-m3"`
+→ **1024 dimensions**. Le schéma `vector(1024)` est donc correct.
 
 ```powershell
 ollama pull bge-m3

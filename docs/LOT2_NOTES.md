@@ -25,7 +25,7 @@ Les autres dépendances sont déjà présentes (FastAPI 0.138, uvicorn 0.49, pyd
 
 ## Avant la première ingestion — ordre obligatoire
 
-1. ✅ Ollama 0.40.16 installé. À télécharger : `ollama pull bge-m3` (1024 dims, vérifié).
+1. ✅ Ollama 0.40.16 installé, `bge-m3` téléchargé et **dimension réellement mesurée à 1024** via `/api/embed` le 2026-11-19.
 2. ✅ Valeurs par défaut déjà posées dans `config.py` : `bge-m3` / `1024` (surchargeables par `PFE_EMBEDDING_MODEL` / `PFE_EMBEDDING_DIM`).
 3. ✅ Même dimension dans `schema.sql` : `vector(1024)`.
 4. ✅ Base encore vide : aucun `INSERT` n'a eu lieu, donc rien à recréer.
