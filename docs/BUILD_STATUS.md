@@ -27,14 +27,16 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 | `docker` 29.9.3 | ✅ installé (Virtual Machine Platform + WSL activés, redémarrage fait) | — |
 | `ollama` | ❌ absent | **TOI** : installer Ollama |
 | poids des modèles | ❌ non téléchargés | **TOI** : `ollama pull <tag vérifié>` |
-| PostgreSQL + pgvector | ❌ non installé | **TOI** : conteneur Docker pgvector |
-| Token GitHub | ❌ non fourni | **TOI** : PAT fin-grained, jamais commité |
+| PostgreSQL + pgvector | ✅ conteneur `pfe-pg` (pgvector **0.8.7**) sur `localhost:5432`, base `pfe_factory`, user `pfe` | — |
+| Token GitHub | ❌ non fourni (push fait via Credential Manager) | **TOI** : PAT fin-grained uniquement si besoin API, jamais commité |
 
 ## Vérifications réelles passées (2026-11-18)
 
 - `mvn -q -DskipTests compile` → **BUILD SUCCESS** (Spring Boot 3.5.16 + Spring AI 1.0.9 + JJWT 0.12.6).
 - `python -m unittest discover -s tests -v` (rag-service) → **3 tests OK**.
 - Versions vérifiées sur Maven Central, pas inventées. `spring-ai-starter-model-ollama` est le nom correct (l'ancien `-ollama-spring-boot-starter` n'existe plus en 1.0.x).
+- Dépôt GitHub `Scroll-7/ai-software-factory` créé et pushé sur `master` (2 commits, arbre propre).
+- `docker run -d --name pfe-pg ... pgvector/pgvector:pg16` → conteneur **Up**, `pg_isready` OK, `CREATE EXTENSION vector` → **0.8.7**. `pgcrypto` sera créé par `schema.sql` au 1er démarrage de l'API.
 
 ## Lots de construction
 

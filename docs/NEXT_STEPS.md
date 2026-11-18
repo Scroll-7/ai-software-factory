@@ -32,14 +32,14 @@ python -m pip install "psycopg[binary]"
 
 Si ça échoue à cause de Python 3.14, dis-moi — on utilisera une version précise.
 
-## Étape 7 — Démarrer PostgreSQL + pgvector
+## Étape 7 — Démarrer PostgreSQL + pgvector ✅ FAIT (2026-11-18)
 
 ```powershell
 docker run -d --name pfe-pg -e POSTGRES_USER=pfe -e POSTGRES_PASSWORD=pfe -e POSTGRES_DB=pfe_factory -p 5432:5432 pgvector/pgvector:pg16
 docker exec -it pfe-pg psql -U pfe -d pfe_factory -c "CREATE EXTENSION IF NOT EXISTS vector; SELECT extversion FROM pg_extension WHERE extname='vector';"
 ```
 
-Attendu : une ligne avec `extversion` (par exemple `0.8.0`).
+Résultat réel : conteneur `pfe-pg` **Up**, `pg_isready` OK, `vector | 0.8.7`. Rien à refaire.
 
 ## Étape 8 — Télécharger les modèles locaux
 
