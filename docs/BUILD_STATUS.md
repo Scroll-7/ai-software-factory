@@ -24,7 +24,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 | `node` 24 / `npm` 11 | ✅ présents | — |
 | `java` 21.0.13 | ✅ installé (JDK 17 conservé aussi) | — |
 | `maven` 3.10.1 | ✅ installé (via Chocolatey) | — |
-| `docker` | ❌ absent | **TOI** : installer Docker Desktop |
+| `docker` 29.9.3 | ✅ installé (Virtual Machine Platform + WSL activés, redémarrage fait) | — |
 | `ollama` | ❌ absent | **TOI** : installer Ollama |
 | poids des modèles | ❌ non téléchargés | **TOI** : `ollama pull <tag vérifié>` |
 | PostgreSQL + pgvector | ❌ non installé | **TOI** : conteneur Docker pgvector |
