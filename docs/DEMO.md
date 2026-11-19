@@ -80,7 +80,20 @@ Résultat réel : **4 tests passés, 0 échec**.
 
 ---
 
-## 3. Important : ce que la démo ne montre pas
+## 3. Résultat de la CI sur la PR #1 (vérifié via API GitHub)
+
+| Job | Résultat |
+|---|---|
+| `Tests node:test (déterministes, hors ligne)` — workflow **généré** | ✅ success |
+| `Vérification syntaxique Python (local uniquement)` — workflow **généré** | ✅ success |
+| `Eval harness self-tests` — workflow d'origine | ✅ success |
+| `Node tests + lint` — workflow d'origine | ❌ failure (exit code 9) |
+
+**Le job `Node tests + lint` échoue déjà sur `main`** (commit `06a7542`, vérifié via l'API GitHub). Ce n'est donc **pas** une régression du code généré. En local, `npm run lint` et `npm test` passent (224 tests). Je ne modifie pas le `ci.yml` d'origine : l'original doit rester intact.
+
+**Conséquence pour la protection de branche** : n'exige pas `Node tests + lint` comme check requis tant que ce problème d'origine n'est pas réglé. Exige `tests-node` (workflow généré) à la place.
+
+## 4. Important : ce que la démo ne montre pas
 
 - Le run TC-01 n'a **pas modifié** `index.html`, `style.css` ni `app.js`. Les fichiers i18n sont ajoutés mais pas encore branchés dans l'application : **l'apparence et le comportement du site sont identiques** à l'original.
 - La « version upgrade » se vérifie donc dans ses **fichiers, ses tests et sa CI**, pas à l'écran.
@@ -88,7 +101,9 @@ Résultat réel : **4 tests passés, 0 échec**.
 
 ---
 
-## 4. Démo en direct (facultatif, pousse une branche)
+---
+
+## 5. Démo en direct (facultatif, pousse une branche)
 
 À lancer depuis l'UI (`http://127.0.0.1:4200` → Se connecter → formulaire) ou en PowerShell :
 
@@ -100,7 +115,7 @@ Tu vois `RUNNING` puis `AWAITING_REVIEW` avec une URL de comparaison. Ensuite, c
 
 ---
 
-## 5. À ne jamais faire pendant la démo
+## 6. À ne jamais faire pendant la démo
 
 - Ne pas fusionner la PR.
 - Ne pas lancer `eval_harness.py run` (chaque run pousse une branche).
@@ -109,6 +124,6 @@ Tu vois `RUNNING` puis `AWAITING_REVIEW` avec une URL de comparaison. Ensuite, c
 
 ---
 
-## 6. Soutenance
+## 7. Soutenance
 
 Fil de présentation, 20 questions/réponses et erreurs à éviter : `docs/PART5_SOUTENANCE.md`.
