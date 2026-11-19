@@ -50,7 +50,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - [x] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Branche + push vérifiés, webhook HMAC vérifié, workflow CI cible généré de façon déterministe, protection de branche documentée. Draft PR manuelle (pas de `PFE_GITHUB_TOKEN`).** Voir `docs/GITHUB_SETUP.md`.
 - [x] **Lot 5** — UI Angular (requête, suivi du pipeline, URL de Draft PR, validation humaine). `npm run build` vert le 2026-11-19. Voir `docs/LOT5_NOTES.md`.
 - [x] **Lot 6** — harnais d'évaluation (12 tâches, deux modèles, baseline manuelle). **Code écrit et testé en mode dry-run ; aucun run réel lancé (chaque run pousse une branche).** Voir `docs/eval/README.md`.
-- [ ] **Lot 7** — docs françaises, rapport, mock defense. **Part 3 livrée** : `docs/PART3_CONCEPTION.md`. Parts 4–6 à venir.
+- [ ] **Lot 7** — docs françaises, rapport, mock defense. **Parties 3 et 4 livrées** : `docs/PART3_CONCEPTION.md`, `docs/PART4_RAPPORT.md`. Parties 5–6 à venir.
 
 ## Changements du 2026-11-19 (Lots 3–4, en validation)
 
@@ -61,6 +61,10 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `/error` rendu public pour ne plus masquer les 500 en 403.
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
+
+## Partie 4 — livrée le 2026-11-19
+
+Rapport de projet complet : `docs/PART4_RAPPORT.md`. Résumé exécutif, contexte, réalisations par lot, preuves (TC-01 vert), analyse critique (forces/faiblesses/risques), évaluation, sécurité/éthique, coût, leçons apprises et perspectives. `ASSUMPTION` et `VERIFY` explicites.
 
 ## Part 3 — livrée le 2026-11-19
 
