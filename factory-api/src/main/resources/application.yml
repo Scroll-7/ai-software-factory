@@ -43,6 +43,9 @@ server:
 factory:
   prompts:
     version: v1
+  github:
+    # Secret LOCAL partagé avec le webhook GitHub. Jamais un secret externe, jamais commité en production.
+    webhook-secret: ${PFE_GITHUB_WEBHOOK_SECRET:local-dev-only-webhook-secret}
   limits:
     # CODE a droit à 3 tentatives, les autres à 2 (voir Part 2).
     max-attempts:

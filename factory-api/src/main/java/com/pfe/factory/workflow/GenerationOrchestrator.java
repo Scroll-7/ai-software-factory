@@ -19,6 +19,8 @@ import com.pfe.factory.validation.DomainValidator;
 import com.pfe.factory.validation.ErrorDigest;
 import com.pfe.factory.validation.MiniJsonSchemaValidator;
 import org.springframework.stereotype.Service;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -123,6 +125,7 @@ public class GenerationOrchestrator {
                 codeValuesByPath.put(f.path(), codeValues);
             }
         }
+        addTargetWorkflow(targetApp, generated);
         repo.saveArtifacts(runId, "CODE", "FILE", generated);
         repo.event(runId, "CODE", "SUCCEEDED", generated.size() + " fichiers générés");
 
@@ -325,6 +328,23 @@ public class GenerationOrchestrator {
             return errors;
         } catch (Exception e) {
             return List.of("public/i18n/fr.json: JSON invalide (" + e.getMessage() + ")");
+        }
+    }
+
+    /**
+     * ASSUMPTION : le workflow CI du dépôt cible est un artefact DÉTERMINISTE.
+     * On ne le confie jamais au modèle local, et on ne remplace pas un workflow existant.
+     */
+    private void addTargetWorkflow(String targetApp, List<Model.GeneratedFile> generated) {
+        String path = ".github/workflows/factory-generated-ci.yml";
+        if (generated.stream().anyMatch(f -> f.path().equals(path))) return;
+        String resource = "/templates/github/" + targetApp + "-ci.yml";
+        try (InputStream in = GenerationOrchestrator.class.getResourceAsStream(resource)) {
+            if (in == null) return; // PAS de template pour cette cible : on n'invente rien.
+            String content = new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            generated.add(new Model.GeneratedFile(path, content));
+        } catch (Exception e) {
+            throw new IllegalStateException("workflow cible illisible: " + resource, e);
         }
     }
 

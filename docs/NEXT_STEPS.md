@@ -87,6 +87,10 @@ Comme `PFE_GITHUB_TOKEN` n'est pas défini, l'API renvoie une URL de comparaison
 Dernière URL obtenue :
 `https://github.com/Scroll-7/Fake-exposer/compare/main...factory%2Fad0b83c6-2c49-4f8f-9375-15f756ba7573%2F4e428258-dbf0-45a3-b04b-b5dc09e3f3f4`
 
+## Étape 11 — Webhook et protection de branche (lecture)
+
+Tout est expliqué, avec les commandes de test, dans `docs/GITHUB_SETUP.md`. À faire par toi dans GitHub : protection de `main` (1 approbation, checks requis, fusion manuelle). Le webhook local est testé (401 si signature fausse) ; le recevoir depuis GitHub demande une URL publique, donc reste optionnel en 100 % local.
+
 ---
 
 ### Pour info — pourquoi 8081

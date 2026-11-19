@@ -8,6 +8,7 @@ public record FactoryProperties(
         Prompts prompts,
         Limits limits,
         Rag rag,
+        Github github,
         Scm scm,
         Workspaces workspaces,
         Telemetry telemetry) {
@@ -24,6 +25,8 @@ public record FactoryProperties(
     }
 
     public record Rag(String baseUrl) {}
+
+    public record Github(String webhookSecret) {}
 
     public record Scm(String defaultRepo, String fakeExposerRepo) {}
 

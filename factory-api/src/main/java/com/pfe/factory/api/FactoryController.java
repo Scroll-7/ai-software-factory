@@ -112,11 +112,17 @@ public class FactoryController {
 
     @PostMapping("/runs/{runId}/approve")
     public Map<String, Object> approve(@PathVariable UUID runId, @Valid @RequestBody Approval body) {
+        // L'agent REVIEW utilise APPROVE/REJECT ; la table SQL utilise APPROVED/REJECTED.
+        String decision = switch (body.decision()) {
+            case "APPROVE" -> "APPROVED";
+            case "REJECT" -> "REJECTED";
+            default -> body.decision();
+        };
         jdbc.update("insert into approval(run_id,approver_id,decision,comment) values(?,?,?::review_decision,?)",
-                runId, body.approverId(), body.decision(), body.comment());
+                runId, body.approverId(), decision, body.comment());
         audit.append(runId, body.approverId().toString(), "HUMAN_APPROVAL", runId.toString(),
-                Map.of("decision", body.decision()));
-        return Map.of("runId", runId, "decision", body.decision(),
+                Map.of("decision", decision));
+        return Map.of("runId", runId, "decision", decision,
                 "nextStep", "Fusionne la PR manuellement dans GitHub.");
     }
 

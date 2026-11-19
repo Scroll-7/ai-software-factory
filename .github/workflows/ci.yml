@@ -32,3 +32,17 @@ jobs:
       - name: Tests unitaires (sans dépendance externe)
         working-directory: rag-service
         run: python -m unittest discover -s tests -v
+
+  ui-angular:
+    name: Build factory-ui (Angular 21)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: factory-ui/package-lock.json
+      - name: Build
+        working-directory: factory-ui
+        run: npm ci && npm run build

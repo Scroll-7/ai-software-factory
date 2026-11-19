@@ -47,7 +47,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - [x] **Lot 1** — squelette `factory-api` (Java 21, Spring Boot, Spring AI), schémas JSON des 5 agents, prompts `v1`, SQL complet. Voir `docs/LOT1_NOTES.md`.
 - [x] **Lot 2** — `rag-service` FastAPI (ingestion, chunking, embedding, retrieval, `/context/build`). Voir `docs/LOT2_NOTES.md`.
 - [x] **Lot 3** — boucle generate/check/retry réelle + `check-runner` Docker + normaliseur d'erreurs. **TC-01 vert le 2026-11-19.**
-- [ ] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Branche + push vérifiés ; URL de comparaison renvoyée (pas de `PFE_GITHUB_TOKEN`). `.github/workflows` cibles et webhook restent à faire.**
+- [x] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Branche + push vérifiés, webhook HMAC vérifié, workflow CI cible généré de façon déterministe, protection de branche documentée. Draft PR manuelle (pas de `PFE_GITHUB_TOKEN`).** Voir `docs/GITHUB_SETUP.md`.
 - [x] **Lot 5** — UI Angular (requête, suivi du pipeline, URL de Draft PR, validation humaine). `npm run build` vert le 2026-11-19. Voir `docs/LOT5_NOTES.md`.
 - [ ] **Lot 6** — harnais d'évaluation (10–15 tâches, deux modèles, baseline manuelle).
 - [ ] **Lot 7** — docs françaises, rapport, mock defense (Parts 3–6 à livrer quand tu dis `continue`).
@@ -61,6 +61,13 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `/error` rendu public pour ne plus masquer les 500 en 403.
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
+
+## Lot 4 — complété le 2026-11-19
+
+- `POST /api/v1/webhooks/github` : vérification `X-Hub-Signature-256` (HMAC-SHA256), événement tracé dans `audit_log`, **aucun appel sortant**. Test réel : signature valide → `recorded: true`, signature fausse → **401**.
+- Le workflow CI cible est un **template déterministe** (`templates/github/fake-exposer-ci.yml`), injecté sous `.github/workflows/factory-generated-ci.yml` sans écraser le `ci.yml` existant de Fake-exposer. Présent vérifié dans le jar.
+- Correction : libellé d'événement `GITHUB_PR` ajouté à l'enum `stage_name` (migration idempotente), et décisions UI `APPROVE`/`REJECT` normalisées en `APPROVED`/`REJECTED` pour la table SQL. Test réel : `POST /approve` avec `APPROVE` → `APPROVED`.
+- La CI du dépôt usine vérifie aussi le build Angular (`npm ci && npm run build`).
 
 ## Lot 5 — vérifié le 2026-11-19
 

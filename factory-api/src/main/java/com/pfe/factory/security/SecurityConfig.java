@@ -28,7 +28,7 @@ public class SecurityConfig {
             .cors(c -> c.configurationSource(source))
             .authorizeHttpRequests(auth -> auth
                 // /error doit rester public : sinon une erreur 500 est masquée en 403.
-                .requestMatchers("/api/v1/auth/**", "/error").permitAll()
+                .requestMatchers("/api/v1/auth/**", "/api/v1/webhooks/**", "/error").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class);
         return http.build();

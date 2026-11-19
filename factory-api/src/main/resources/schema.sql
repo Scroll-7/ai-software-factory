@@ -11,7 +11,9 @@ CREATE EXTENSION IF NOT EXISTS pgcrypto;;
 -- ne doivent donc jamais finir une ligne (sinon Spring couperait le bloc en deux).
 DO $$ BEGIN CREATE TYPE request_status AS ENUM ('NEW','RUNNING','AWAITING_REVIEW','APPROVED','REJECTED','MERGED','DEPLOYED','FAILED'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
-DO $$ BEGIN CREATE TYPE stage_name AS ENUM ('SPECS','DESIGN','CODE','TESTS','REVIEW','GITLAB_MR','CI','STAGING'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
+DO $$ BEGIN CREATE TYPE stage_name AS ENUM ('SPECS','DESIGN','CODE','TESTS','REVIEW','GITLAB_MR','GITHUB_PR','CI','STAGING'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
+-- Migration idempotente pour une base déjà créée (ancien libellé GITLAB_MR conservé).
+ALTER TYPE stage_name ADD VALUE IF NOT EXISTS 'GITHUB_PR';;
 
 DO $$ BEGIN CREATE TYPE stage_status AS ENUM ('PENDING','RUNNING','SUCCEEDED','FAILED','SKIPPED','AWAITING_HUMAN'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
