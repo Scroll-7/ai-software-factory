@@ -87,6 +87,7 @@ public class DomainValidator {
                         errors.add(path + ": appel externe ou API dangereuse détectée");
                     if (content.contains("TODO") || content.contains("FIXME"))
                         errors.add(path + ": marqueur TODO/FIXME interdit");
+                    errors.addAll(jsImportErrors(path, content));
                     for (String r : textArray(f.path("requirementIds"))) {
                         if (!c.requirementIds().contains(r)) errors.add(path + ": exigence inconnue " + r);
                     }
@@ -109,6 +110,7 @@ public class DomainValidator {
                     String content = f.path("content").asText();
                     if (content.matches("(?s).*(Date\\.now|Math\\.random|new Random|http).*"))
                         errors.add(path + ": test non déterministe");
+                    errors.addAll(jsImportErrors(path, content));
                     for (String r : textArray(f.path("requirementIds"))) {
                         if (!c.requirementIds().contains(r)) errors.add(path + ": exigence inconnue " + r);
                     }
@@ -142,6 +144,20 @@ public class DomainValidator {
             }
             default -> errors.add("stage inconnu: " + stage);
         }
+        return errors;
+    }
+
+    /** Contrôle statique des imports ESM manquants (erreur runtime classique du modèle 7B). */
+    private List<String> jsImportErrors(String path, String content) {
+        List<String> errors = new ArrayList<>();
+        if (!path.endsWith(".js")) return errors;
+        if (content.contains("fs.") && !content.contains("node:fs"))
+            errors.add(path + ": fs utilisé sans import node:fs");
+        if ((content.contains("describe(") || content.contains("it("))
+                && !content.contains("node:test"))
+            errors.add(path + ": describe/it utilisés sans import node:test");
+        if (content.contains("assert.") && !content.contains("node:assert"))
+            errors.add(path + ": assert utilisé sans import node:assert");
         return errors;
     }
 
