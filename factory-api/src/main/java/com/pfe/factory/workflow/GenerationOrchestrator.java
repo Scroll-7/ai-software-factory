@@ -207,7 +207,7 @@ public class GenerationOrchestrator {
                 String.valueOf(run.get("title")),
                 "Revue: " + review.path("summary").asText(), generated);
         audit.append(runId, "system", "DRAFT_PR_CREATED", pr.url(), Map.of("number", pr.number()));
-        repo.event(runId, "GITLAB_MR", "AWAITING_HUMAN", pr.url());
+        repo.event(runId, "GITHUB_PR", "AWAITING_HUMAN", pr.url());
         return pr;
     }
 

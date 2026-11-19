@@ -70,13 +70,22 @@ Attendu : les lignes `bge-m3` et `qwen2.5-coder:7b`.
 ✅ Lots 3–4 écrits : `RepoClient`, `RagClient`, `CheckClient` Docker `--network none`, `ScmClient` GitHub, `seed.sql`.
 ✅ API démarrée sur **http://127.0.0.1:8081** (pas 8080 : ce port est occupé par Oracle `TNSLSNR.EXE`, on ne l'arrête pas).
 
-Le test TC-01 est en cours d'exécution **asynchrone**. Pour le rejouer plus tard :
+✅ **TC-01 est vert** (2026-11-19) : `SPECS → DESIGN → CODE → TESTS → REVIEW → AWAITING_REVIEW`. Branche poussée sur `Scroll-7/Fake-exposer`, aucune fusion.
+
+Rejouer le test :
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File scripts\tc01.ps1
 ```
 
-Le script affiche `RUNNING` puis `AWAITING_REVIEW` avec l'URL de la Draft PR (ou `FAILED` avec l'erreur).
+Le script affiche `RUNNING` puis `AWAITING_REVIEW` avec l'URL de comparaison GitHub (ou `FAILED` avec l'erreur).
+
+## Étape 10 — Créer la Draft PR à la main (à faire par toi, sans secret)
+
+Comme `PFE_GITHUB_TOKEN` n'est pas défini, l'API renvoie une URL de comparaison. Ouvre-la dans GitHub, choisis **Create pull request**, puis **Draft pull request**. Ne fusionne pas.
+
+Dernière URL obtenue :
+`https://github.com/Scroll-7/Fake-exposer/compare/main...factory%2Fad0b83c6-2c49-4f8f-9375-15f756ba7573%2F4e428258-dbf0-45a3-b04b-b5dc09e3f3f4`
 
 ---
 

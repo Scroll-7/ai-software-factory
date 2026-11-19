@@ -46,8 +46,8 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - [x] **Lot 0** — README, `.gitignore`, ce fichier, guide d'installation Windows.
 - [x] **Lot 1** — squelette `factory-api` (Java 21, Spring Boot, Spring AI), schémas JSON des 5 agents, prompts `v1`, SQL complet. Voir `docs/LOT1_NOTES.md`.
 - [x] **Lot 2** — `rag-service` FastAPI (ingestion, chunking, embedding, retrieval, `/context/build`). Voir `docs/LOT2_NOTES.md`.
-- [ ] **Lot 3** — boucle generate/check/retry réelle + `check-runner` Docker + normaliseur d'erreurs. **Code écrit, TC-01 en cours de validation.**
-- [ ] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Code écrit (branche + push + Draft PR via API si `PFE_GITHUB_TOKEN`, sinon URL de comparaison) ; `.github/workflows` restent à faire.**
+- [x] **Lot 3** — boucle generate/check/retry réelle + `check-runner` Docker + normaliseur d'erreurs. **TC-01 vert le 2026-11-19.**
+- [ ] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Branche + push vérifiés ; URL de comparaison renvoyée (pas de `PFE_GITHUB_TOKEN`). `.github/workflows` cibles et webhook restent à faire.**
 - [ ] **Lot 5** — UI Angular (requête, specs, diff, revue, validation, suivi).
 - [ ] **Lot 6** — harnais d'évaluation (10–15 tâches, deux modèles, baseline manuelle).
 - [ ] **Lot 7** — docs françaises, rapport, mock defense (Parts 3–6 à livrer quand tu dis `continue`).
@@ -61,6 +61,15 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `/error` rendu public pour ne plus masquer les 500 en 403.
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
+
+## TC-01 — vert le 2026-11-19 (preuve de bout en bout)
+
+Run `4e428258-dbf0-45a3-b04b-b5dc09e3f3f4` : `SPECS ✅ → DESIGN ✅ → CODE ✅ (4 fichiers) → TESTS ✅ (Docker `--network none`) → REVIEW ✅ → AWAITING_REVIEW`.
+
+- Branche poussée et vérifiée : `factory/ad0b83c6-2c49-4f8f-9375-15f756ba7573/4e428258-dbf0-45a3-b04b-b5dc09e3f3f4` sur `Scroll-7/Fake-exposer` (`git ls-remote` → `4f5fe628…`).
+- Aucune fusion, aucun merge automatique. L'URL renvoyée est une URL de **comparaison GitHub** à ouvrir manuellement pour créer la Draft PR (absence de `PFE_GITHUB_TOKEN`).
+- Normalisations déterministes supplémentaires : garde-fou anti-boucle du modèle 7B (`repeat-penalty`, `temperature=0.1`), enveloppement des sorties CODE/TESTS nues, ajout des imports ESM manquants, parité des clés `fr.json`/`en.json`, traçabilité REVIEW complétée. ASSUMPTION : nécessaires avec un modèle local 7B.
+- Rejouable en une commande : `powershell -ExecutionPolicy Bypass -File scripts\tc01.ps1`.
 
 ## Règles pour moi
 
