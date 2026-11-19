@@ -107,7 +107,7 @@ public class GenerationOrchestrator {
         repo.event(runId, "DESIGN", "SUCCEEDED", "plan de " + design.path("filePlan").size() + " fichiers");
 
         List<Model.GeneratedFile> generated = new ArrayList<>();
-        Map<String, String> firstCodeValues = null;
+        Map<String, Map<String, String>> codeValuesByPath = new HashMap<>();
         for (JsonNode plan : design.path("filePlan")) {
             String path = plan.path("path").asText();
             Map<String, String> codeValues = new HashMap<>(base);
@@ -117,9 +117,11 @@ public class GenerationOrchestrator {
             codeValues.put("CURRENT_FILE", "CREATE".equals(plan.path("action").asText())
                     ? "" : repoClient.read(repoName, path));
             codeValues.put("FEW_SHOT_EXAMPLE", "// Exemple issu de synthetic://templates (à brancher Lot 2)");
-            if (firstCodeValues == null) firstCodeValues = new HashMap<>(codeValues);
             JsonNode code = callStage("CODE", runId, codeValues, ctx, modelKey);
-            generated.addAll(toFiles(code));
+            for (Model.GeneratedFile f : toFiles(code)) {
+                generated.add(f);
+                codeValuesByPath.put(f.path(), codeValues);
+            }
         }
         repo.saveArtifacts(runId, "CODE", "FILE", generated);
         repo.event(runId, "CODE", "SUCCEEDED", generated.size() + " fichiers générés");
@@ -138,11 +140,25 @@ public class GenerationOrchestrator {
                 throw new IllegalStateException("circuit breaker: " + digest.signature());
             }
             repairs++;
-            Map<String, String> repair = new HashMap<>(firstCodeValues);
-            repair.put("REPAIR_NOTE", "ERREUR À CORRIGER (signature " + digest.signature() + ")\n"
-                    + String.join("\n", digest.messages()) + "\n" + digest.rawTail());
-            JsonNode fixed = callStage("CODE", runId, repair, ctx, modelKey);
-            generated = toFiles(fixed);
+            String failingPath = findFailingPath(result, generated);
+            Map<String, String> original = codeValuesByPath.getOrDefault(
+                    failingPath, generated.isEmpty() ? Map.of() : codeValuesByPath.get(generated.get(0).path()));
+            Map<String, String> repair = new HashMap<>(original);
+            repair.put("FILE_PATH", failingPath);
+            String brokenContent = generated.stream()
+                    .filter(f -> f.path().equals(failingPath))
+                    .map(Model.GeneratedFile::content).findFirst().orElse("");
+            repair.put("CURRENT_FILE", brokenContent);
+            repair.put("REPAIR_NOTE", "ERREUR À CORRIGER DANS " + failingPath + " (signature "
+                    + digest.signature() + ")\n"
+                    + String.join("\n", digest.messages()) + "\n" + digest.rawTail()
+                    + "\nCorrige UNIQUEMENT ce fichier. N'ajoute aucun import vers un module absent du dépôt.");
+            List<Model.GeneratedFile> fixedFiles = toFiles(
+                    callStage("CODE", runId, repair, ctx, modelKey));
+            if (!fixedFiles.isEmpty()) {
+                generated.removeIf(f -> f.path().equals(failingPath));
+                generated.add(fixedFiles.get(0));
+            }
             result = checkClient.applyAndCheck(runId, generated);
         }
         repo.event(runId, "TESTS", "SUCCEEDED", "checks verts");
@@ -270,6 +286,16 @@ public class GenerationOrchestrator {
                 requirement.set("sourceUris", kept);
             }
         }
+    }
+
+    /** Retrouve le fichier fautif à partir du message d'erreur du check. */
+    private String findFailingPath(Model.CheckResult result, List<Model.GeneratedFile> files) {
+        String all = result.stdout() + "\n" + result.stderr();
+        for (Model.GeneratedFile f : files) {
+            if (all.contains(f.path())) return f.path();
+        }
+        // ASSUMPTION : en cas de doute, le dernier fichier généré est celui du test.
+        return files.isEmpty() ? "" : files.get(files.size() - 1).path();
     }
 
     /**

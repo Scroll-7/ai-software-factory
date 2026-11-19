@@ -16,6 +16,9 @@ RÈGLES SPÉCIFIQUES
 - Pour l'i18n : dictionnaires dans public/i18n/fr.json et en.json, sans nouvelle dépendance.
 - Pour le CV : le score est une AIDE, la décision finale reste humaine ; aucun attribut protégé (âge, sexe, origine) dans le calcul.
 - Interdits : appel réseau sortant, clé API, eval, innerHTML, ProcessBuilder, child_process, subprocess, TODO/FIXME.
+- CRITIQUE : n'importe AUCUN module absent de « CONTEXTE DU DÉPÔT CIBLE » et de la liste des fichiers à produire.
+  En particulier, n'écris PAS `import ... from '../services/i18n.js'` : ce fichier n'existe pas.
+  Un test i18n lit directement public/i18n/fr.json et public/i18n/en.json avec node:fs.
 - Remplis selfCheck honnêtement : chaque case sera revérifiée par le code.
 - Écris d'abord explanation (1 à 3 lignes), puis content.
 
