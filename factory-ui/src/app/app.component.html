@@ -1,0 +1,94 @@
+<main class="shell">
+  <header>
+    <h1>AI Software Factory</h1>
+    <p class="subtitle">Poste de contrôle local — aucune donnée réelle, aucun service externe.</p>
+  </header>
+
+  <section class="card" aria-label="Connexion locale">
+    <h2>1. Connexion</h2>
+    <div class="row">
+      <label for="token">Jeton local (laisser vide pour le générer)</label>
+      <input id="token" type="password" [(ngModel)]="token" placeholder="Jeton JWT local" />
+      <button type="button" (click)="login()">Se connecter</button>
+    </div>
+    <p class="hint" *ngIf="loginMessage">{{ loginMessage }}</p>
+  </section>
+
+  <section class="card" [class.disabled]="!connected" aria-label="Nouvelle demande">
+    <h2>2. Demande métier</h2>
+    <div class="row">
+      <label for="title">Titre</label>
+      <input id="title" [(ngModel)]="title" />
+    </div>
+    <div class="row">
+      <label for="business">Texte métier (français)</label>
+      <textarea id="business" rows="8" [(ngModel)]="businessText"></textarea>
+    </div>
+    <div class="row grid">
+      <div>
+        <label for="targetApp">Application cible</label>
+        <select id="targetApp" [(ngModel)]="targetApp">
+          <option value="fake-exposer">fake-exposer</option>
+          <option value="demo-hr-app">demo-hr-app</option>
+        </select>
+      </div>
+      <div>
+        <label for="targetRepo">Dépôt GitHub cible</label>
+        <input id="targetRepo" [(ngModel)]="targetRepo" />
+      </div>
+      <div>
+        <label for="locale">Langue</label>
+        <select id="locale" [(ngModel)]="locale">
+          <option value="fr">fr</option>
+          <option value="en">en</option>
+          <option value="both">both</option>
+        </select>
+      </div>
+    </div>
+    <button type="button" (click)="submit()" [disabled]="!connected || busy">
+      {{ busy ? 'Pipeline en cours…' : 'Lancer le pipeline' }}
+    </button>
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </section>
+
+  <section class="card" *ngIf="runId" aria-label="Suivi du pipeline">
+    <h2>3. Suivi — <code>{{ runId }}</code></h2>
+    <p class="status">Statut : <strong>{{ execution?.status ?? 'chargement…' }}</strong></p>
+    <ol class="events">
+      <li *ngFor="let event of events">
+        <span class="badge" [class.ok]="event.status === 'SUCCEEDED'"
+              [class.warn]="event.status === 'AWAITING_HUMAN'">{{ event.status }}</span>
+        <span class="stage">{{ event.stage }}</span>
+        <span class="message">{{ event.message }}</span>
+      </li>
+    </ol>
+    <p class="error" *ngIf="execution?.error">{{ execution?.error }}</p>
+    <p *ngIf="execution?.pullRequest as pr">
+      Draft PR à ouvrir manuellement :
+      <a [href]="pr.url" target="_blank" rel="noopener noreferrer">{{ pr.url }}</a>
+    </p>
+  </section>
+
+  <section class="card" *ngIf="execution?.status === 'AWAITING_REVIEW'" aria-label="Validation humaine">
+    <h2>4. Décision humaine</h2>
+    <p>La fusion se fait uniquement à la main dans GitHub.</p>
+    <div class="row">
+      <label for="decision">Décision</label>
+      <select id="decision" [(ngModel)]="decision">
+        <option value="APPROVE">APPROVE</option>
+        <option value="CHANGES_REQUESTED">CHANGES_REQUESTED</option>
+        <option value="REJECT">REJECT</option>
+      </select>
+    </div>
+    <div class="row">
+      <label for="comment">Commentaire</label>
+      <textarea id="comment" rows="3" [(ngModel)]="approvalComment"></textarea>
+    </div>
+    <button type="button" (click)="approve()">Enregistrer la décision</button>
+    <p class="hint" *ngIf="approvalMessage">{{ approvalMessage }}</p>
+  </section>
+
+  <footer>
+    <p>API locale : <code>{{ apiBase }}</code> — UI : <code>http://127.0.0.1:4200</code></p>
+  </footer>
+</main>
