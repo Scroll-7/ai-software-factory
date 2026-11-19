@@ -1,0 +1,17 @@
+{
+  "_comment": "BASELINE MANUELLE À REMPLIR PAR TOI. minutes = temps réel passé à faire la tâche toi-même ; quality = note de 1 à 5. Laisse null tant que ce n'est pas mesuré. Aucune donnée réelle ici.",
+  "tasks": {
+    "E01": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "E02": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "E03": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "E04": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "E05": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "E06": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "H01": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "H02": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "H03": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "H04": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "H05": { "minutes": null, "quality": null, "note": "À mesurer" },
+    "H06": { "minutes": null, "quality": null, "note": "À mesurer" }
+  }
+}

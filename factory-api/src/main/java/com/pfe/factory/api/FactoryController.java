@@ -38,16 +38,24 @@ public class FactoryController {
     }
 
     public record NewRequest(String title, String businessText, String targetApp,
-                             String targetRepo, String locale, UUID requesterId) {}
+                             String targetRepo, String locale, UUID requesterId,
+                             String modelKey) {}
 
     public record Approval(String decision, String comment, UUID approverId) {}
 
     @PostMapping("/change-requests")
     public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody NewRequest body) {
         String repoName = body.targetRepo() != null ? body.targetRepo() : defaultRepoFor(body.targetApp());
+        String modelKey = body.modelKey() == null || body.modelKey().isBlank()
+                ? "ollama-local" : body.modelKey();
+        Integer active = jdbc.queryForObject(
+                "select count(*) from model_config where key=? and kind='LLM' and is_active=true",
+                Integer.class, modelKey);
+        if (active == null || active == 0)
+            throw new IllegalArgumentException("modèle local inconnu ou inactif: " + modelKey);
         UUID requestId = repo.createRequest(body.title(), body.businessText(), body.targetApp(),
                 repoName, body.locale() == null ? "fr" : body.locale(), body.requesterId());
-        UUID runId = repo.createRun(requestId, "ollama-local", "ollama-embed-local",
+        UUID runId = repo.createRun(requestId, modelKey, "ollama-embed-local",
                 props.prompts().version());
         audit.append(runId, "requester", "REQUEST_CREATED", requestId.toString(),
                 Map.of("targetApp", body.targetApp()));
@@ -124,6 +132,11 @@ public class FactoryController {
                 Map.of("decision", decision));
         return Map.of("runId", runId, "decision", decision,
                 "nextStep", "Fusionne la PR manuellement dans GitHub.");
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> badRequest(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
     }
 
     private String defaultRepoFor(String targetApp) {

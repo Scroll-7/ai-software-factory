@@ -70,6 +70,7 @@ public class GenerationOrchestrator {
         String targetApp = String.valueOf(run.get("target_app"));
         String repoName = String.valueOf(run.get("target_repo"));
         String modelKey = String.valueOf(run.get("llm_model_key"));
+        String modelName = repo.modelName(modelKey);
         String businessText = repo.requestText(runId);
 
         List<Model.Chunk> chunks = ragClient.search(targetApp + " standard local", "STANDARD", 5);
@@ -85,6 +86,7 @@ public class GenerationOrchestrator {
         base.put("RAG_CONTEXT", ragContext);
         base.put("REPO_CONTEXT", repoContext);
         base.put("TARGET_APP", targetApp);
+        base.put("MODEL_NAME", modelName == null ? "" : modelName);
 
         Map<String, String> specsValues = new HashMap<>(base);
         specsValues.put("BUSINESS_TEXT", businessText);
@@ -222,7 +224,7 @@ public class GenerationOrchestrator {
         for (int attempt = 1; attempt <= max; attempt++) {
             String prompt = prompts.render(stage, current);
             long t0 = System.currentTimeMillis();
-            String raw = gateway.call(prompt);
+            String raw = gateway.call(prompt, current.get("MODEL_NAME"));
             JsonNode output;
             List<String> errors;
             try {

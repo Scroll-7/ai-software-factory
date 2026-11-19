@@ -38,6 +38,11 @@ public class RunRepository {
         return id;
     }
 
+    /** Nom réel du modèle Ollama associé à une clé locale (traçabilité + évaluation). */
+    public String modelName(String key) {
+        return jdbc.queryForObject("select model_name from model_config where key=?", String.class, key);
+    }
+
     public Map<String, Object> run(UUID runId) {
         return jdbc.queryForMap(
                 "select r.*, c.title, c.business_text, c.target_app, c.target_repo "

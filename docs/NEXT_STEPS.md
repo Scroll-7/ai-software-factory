@@ -91,6 +91,17 @@ Dernière URL obtenue :
 
 Tout est expliqué, avec les commandes de test, dans `docs/GITHUB_SETUP.md`. À faire par toi dans GitHub : protection de `main` (1 approbation, checks requis, fusion manuelle). Le webhook local est testé (401 si signature fausse) ; le recevoir depuis GitHub demande une URL publique, donc reste optionnel en 100 % local.
 
+## Étape 12 — Évaluation (quand tu veux)
+
+Le harnais est prêt. Sans effet de bord :
+
+```powershell
+python scripts/eval_harness.py list
+python scripts/eval_harness.py dry-run
+```
+
+La procédure complète (activation du 3B, lancement d'un run, baseline manuelle, rapport) est dans `docs/eval/README.md`. Je ne lance pas les 24 runs sans ton accord explicite : chacun crée une branche sur GitHub.
+
 ---
 
 ### Pour info — pourquoi 8081

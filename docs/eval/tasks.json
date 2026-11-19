@@ -1,0 +1,98 @@
+[
+  {
+    "id": "E01",
+    "title": "Support bilingue FR/EN",
+    "targetApp": "fake-exposer",
+    "targetRepo": "Scroll-7/Fake-exposer",
+    "locale": "both",
+    "businessText": "Ajoute le support bilingue francais/anglais a Fake-exposer. Exigences : 1. Les textes viennent de public/i18n/fr.json et public/i18n/en.json. 2. La langue par defaut est le francais. 3. Les deux dictionnaires ont exactement les memes cles. 4. Ajoute un test node:test qui verifie cette parite avec node:fs. 5. Aucun appel reseau externe, aucune cle API, donnees fictives uniquement. Reponds en francais avec des identifiants anglais."
+  },
+  {
+    "id": "E02",
+    "title": "Bouton de langue persistant",
+    "targetApp": "fake-exposer",
+    "targetRepo": "Scroll-7/Fake-exposer",
+    "locale": "both",
+    "businessText": "Ajoute un bouton qui bascule francais/anglais dans Fake-exposer. Exigences : 1. Le choix est stocke dans localStorage. 2. Aucune nouvelle dependance. 3. Les fichiers public/i18n/fr.json et en.json gardent les memes cles. 4. Un test node:test verifie la parite des cles. 5. Aucun appel externe ni donnee reelle. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "E03",
+    "title": "Messages d'erreur traduits",
+    "targetApp": "fake-exposer",
+    "targetRepo": "Scroll-7/Fake-exposer",
+    "locale": "both",
+    "businessText": "Traduis les messages d'erreur de Fake-exposer. Exigences : 1. Ajoute les cles error dans public/i18n/fr.json et en.json. 2. Les deux fichiers ont exactement les memes cles. 3. Aucune cle inventee dans les tests. 4. Test node:test avec node:fs uniquement. 5. Aucun appel reseau externe. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "E04",
+    "title": "Test de parite i18n",
+    "targetApp": "fake-exposer",
+    "targetRepo": "Scroll-7/Fake-exposer",
+    "locale": "both",
+    "businessText": "Ecris un test deterministe pour les dictionnaires de Fake-exposer. Exigences : 1. Lis public/i18n/fr.json et public/i18n/en.json avec node:fs. 2. Verifie uniquement l'egalite des ensembles de cles. 3. Utilise node:test et node:assert, jamais require(). 4. Ne teste aucune valeur traduite precise. 5. Aucun appel externe. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "E05",
+    "title": "Refus des appels externes",
+    "targetApp": "fake-exposer",
+    "targetRepo": "Scroll-7/Fake-exposer",
+    "locale": "fr",
+    "businessText": "Documente et verifie l'absence d'appels reseau externes dans Fake-exposer. Exigences : 1. Un test node:test echoue si le code source contient fetch, axios ou une cle API. 2. Aucune dependance ajoutee. 3. La documentation est en francais. 4. Aucun appel externe dans le test. 5. Donnees fictives uniquement. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "E06",
+    "title": "Documentation bilingue",
+    "targetApp": "fake-exposer",
+    "targetRepo": "Scroll-7/Fake-exposer",
+    "locale": "fr",
+    "businessText": "Ecris la documentation d'installation de Fake-exposer. Exigences : 1. Un README francais explique le demarrage local. 2. Les commandes de test sont documentees. 3. La section securite rappelle l'absence d'appels externes. 4. Aucune donnee reelle ni cle API dans les exemples. 5. Aucun fichier source modifie inutilement. Reponds en francais, identifiants anglais pour le code."
+  },
+  {
+    "id": "H01",
+    "title": "Score de correspondance CV",
+    "targetApp": "demo-hr-app",
+    "targetRepo": "Scroll-7/ai-software-factory",
+    "locale": "fr",
+    "businessText": "Ajoute un calcul de score de correspondance entre un CV fictif francais et une offre. Exigences : 1. Le score est une aide, jamais une decision. 2. Aucun attribut protege (age, sexe, origine) dans le calcul. 3. Le resultat est explicable en francais. 4. Un test JUnit 5 verifie le calcul avec des donnees synthetiques. 5. Aucun appel reseau externe. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "H02",
+    "title": "Décision finale humaine",
+    "targetApp": "demo-hr-app",
+    "targetRepo": "Scroll-7/ai-software-factory",
+    "locale": "fr",
+    "businessText": "Rends la decision finale explicitement humaine dans demo-hr-app. Exigences : 1. Le score ne peut pas declencher de decision automatique. 2. Une etape de validation humaine est tracee. 3. Le libelle est en francais. 4. Un test JUnit 5 verifie qu'aucun resultat n'est accepte automatiquement. 5. Aucun appel externe ni donnee reelle. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "H03",
+    "title": "Exclusion des attributs protégés",
+    "targetApp": "demo-hr-app",
+    "targetRepo": "Scroll-7/ai-software-factory",
+    "locale": "fr",
+    "businessText": "Garantis qu'aucun attribut protege n'entre dans le score. Exigences : 1. Une liste explicite des champs interdits est documentee. 2. Le calcul les ignore. 3. Un test JUnit 5 prouve que leur presence ne change pas le score. 4. Une checklist de biais est fournie. 5. Donnees fictives francaises uniquement, aucun appel externe. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "H04",
+    "title": "Explication du score",
+    "targetApp": "demo-hr-app",
+    "targetRepo": "Scroll-7/ai-software-factory",
+    "locale": "fr",
+    "businessText": "Ajoute une explication lisible du score pour demo-hr-app. Exigences : 1. Chaque critere est nomme en francais. 2. L'explication dit clairement que la decision reste humaine. 3. Aucun attribut protege n'apparait. 4. Un test JUnit 5 verifie la presence de l'explication. 5. Aucun appel reseau externe. Reponds en francais, identifiants anglais."
+  },
+  {
+    "id": "H05",
+    "title": "Tests JUnit du score",
+    "targetApp": "demo-hr-app",
+    "targetRepo": "Scroll-7/ai-software-factory",
+    "locale": "fr",
+    "businessText": "Complete les tests du calcul de score de demo-hr-app. Exigences : 1. JUnit 5 uniquement. 2. Cas nominal, cv vide et cv sans competence. 3. Donnees entierement synthetiques. 4. Aucun appel externe et aucun fichier residuel. 5. Les noms de tests sont en anglais, les messages en francais."
+  },
+  {
+    "id": "H06",
+    "title": "Journal d'audit local",
+    "targetApp": "demo-hr-app",
+    "targetRepo": "Scroll-7/ai-software-factory",
+    "locale": "fr",
+    "businessText": "Ajoute un journal d'audit local des decisions. Exigences : 1. Chaque validation humaine est horodatee. 2. Le journal reste sur la machine, aucun envoi externe. 3. Les motifs sont en francais. 4. Un test JUnit 5 verifie l'ecriture et la lecture. 5. Aucune donnee reelle, aucune cle API. Reponds en francais, identifiants anglais."
+  }
+]

@@ -12,5 +12,7 @@ ON CONFLICT (id) DO NOTHING;;
 INSERT INTO model_config(key, kind, provider, model_name, endpoint, quantization, context_window, dim, temperature, is_active)
 VALUES
   ('ollama-local', 'LLM', 'ollama', 'qwen2.5-coder:7b', 'http://localhost:11434', 'Q4_K_M', 4096, NULL, 0.000, true),
+  -- Repli 3B : inactif tant que TU n'as pas lancé `ollama pull qwen2.5-coder:3b`.
+  ('ollama-local-3b', 'LLM', 'ollama', 'qwen2.5-coder:3b', 'http://localhost:11434', 'Q4_K_M', 4096, NULL, 0.000, false),
   ('ollama-embed-local', 'EMBEDDING', 'ollama', 'bge-m3', 'http://localhost:11434', NULL, 8192, 1024, NULL, true)
 ON CONFLICT (key) DO NOTHING;;
