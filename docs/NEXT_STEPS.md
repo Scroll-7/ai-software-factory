@@ -104,6 +104,12 @@ python scripts/eval_harness.py dry-run
 
 La procédure complète (activation du 3B, lancement d'un run, baseline manuelle, rapport) est dans `docs/eval/README.md`. Je ne lance pas les 24 runs sans ton accord explicite : chacun crée une branche sur GitHub.
 
+## Étape 13 — Faire la démo (prêt)
+
+Le parcours complet est dans `docs/DEMO.md` : preuve API/SQL, Draft PR GitHub #1, copie générée en local sur le port 3002, test généré vert. L'original reste sur `main`, la fusion n'est jamais faite.
+
+Rappel : le site généré a la même apparence que l'original — les changements sont dans les fichiers i18n, le test et la CI, pas dans `index.html`/`style.css`/`app.js`.
+
 ---
 
 ### Pour info — pourquoi 8081

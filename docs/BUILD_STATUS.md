@@ -62,6 +62,14 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
 
+## Démo Draft PR et copie générée — 2026-11-19
+
+- Parcours complet documenté dans `docs/DEMO.md`.
+- **PR Draft réelle** : [Scroll-7/Fake-exposer#1](https://github.com/Scroll-7/Fake-exposer/pull/1), head `factory/60f0bb90-…/e87a5526-…`, badge **Draft**, `main` intact. Créée manuellement depuis le navigateur par l'utilisateur.
+- **Copie générée en local** : worktree `workspaces/Fake-exposer-upgraded` sur la branche de la PR ; l'original `workspaces/Fake-exposer` est revenu sur `main`. `npm ci` installé (183 paquets) ; site servi sur **:3002**, HTTP 200 vérifié. Test généré `node --test test/i18n.test.js` : **4 passés / 0 échec**.
+- **Bug corrigé dans le template CI cible** : il manquait `npm ci` et il utilisait Node 20. Le workflow généré de la PR #1 a été patché et poussé (`cbadcb4`) : Node 24, `npm ci`, puis `node --test test/i18n.test.js`. Le template `templates/github/fake-exposer-ci.yml` est corrigé pour les runs futurs.
+- **Limite de démonstration assumée** : le run ne modifie ni `index.html`, ni `style.css`, ni `app.js` ; les fichiers i18n ne sont pas encore branchés dans l'app. Le site généré a donc la même apparence que l'original : la différence est dans les fichiers/tests/CI.
+
 ## Replay TC-01 et correction workspace — 2026-11-19
 
 - **V1 clos** : TC-01 rejoué avec succès sur le code actuel (workflow cible + `modelKey`). Run `098b26f5-58d3-4dce-a88c-6a37871a4aa1` : `SPECS → DESIGN → CODE → TESTS → REVIEW → GITHUB_PR/AWAITING_HUMAN`. Branche `cef9eaf…` vérifiée par `git ls-remote` sur `Scroll-7/Fake-exposer`. Le template `.github/workflows/factory-generated-ci.yml` est bien présent dans la branche, sans écraser le `ci.yml` existant. Audit : `DRAFT_PR_CREATED`, aucune ligne `MERGE`/`DEPLOY`.
