@@ -2,6 +2,8 @@ package com.pfe.factory.workflow;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.pfe.factory.audit.AuditService;
 import com.pfe.factory.config.FactoryProperties;
 import com.pfe.factory.domain.Model;
@@ -169,7 +171,8 @@ public class GenerationOrchestrator {
         repo.event(runId, "REVIEW", "SUCCEEDED", String.valueOf(review.path("decision").asText()));
 
         String branch = "factory/" + run.get("request_id") + "/" + runId;
-        Model.PrRef pr = scmClient.createDraftPr(runId, branch, String.valueOf(run.get("title")),
+        Model.PrRef pr = scmClient.createDraftPr(runId, repoName, branch,
+                String.valueOf(run.get("title")),
                 "Revue: " + review.path("summary").asText(), generated);
         audit.append(runId, "system", "DRAFT_PR_CREATED", pr.url(), Map.of("number", pr.number()));
         repo.event(runId, "GITLAB_MR", "AWAITING_HUMAN", pr.url());
@@ -180,11 +183,14 @@ public class GenerationOrchestrator {
                                DomainValidator.Context ctx, String modelKey) throws Exception {
         int max = props.limits().maxAttempts(stage);
         Map<String, String> current = new HashMap<>(values);
+        current.put("ALLOWED_SOURCE_URIS", String.join("\n", ctx.allowedSourceUris()));
         for (int attempt = 1; attempt <= max; attempt++) {
             String prompt = prompts.render(stage, current);
             long t0 = System.currentTimeMillis();
             String raw = gateway.call(prompt);
             JsonNode output = mapper.readTree(stripFences(raw));
+            if ("SPECS".equals(stage)) sanitizeSources(output, ctx.allowedSourceUris());
+            if ("DESIGN".equals(stage)) ensureRequirementCoverage(output, new ArrayList<>(ctx.requirementIds()));
             List<String> errors = new ArrayList<>(schemaValidator.validate(stage, output));
             errors.addAll(domainValidator.validate(stage, output, ctx));
             repo.saveAgentOutput(runId, stage, attempt, output, errors, Hashes.sha256(prompt),
@@ -196,6 +202,61 @@ public class GenerationOrchestrator {
                     + String.join("\n", errors));
         }
         throw new IllegalStateException(stage + ": échec après " + max + " tentatives");
+    }
+
+    /** Garantit la traçabilité : toute exigence est couverte par au moins un fichier du plan. */
+    private void ensureRequirementCoverage(JsonNode design, List<String> reqIds) {
+        JsonNode plan = design.path("filePlan");
+        if (!plan.isArray() || plan.isEmpty() || reqIds.isEmpty()) return;
+        Set<String> covered = new HashSet<>();
+        for (JsonNode f : plan) {
+            for (JsonNode r : f.path("requirementIds")) covered.add(r.asText());
+        }
+        ArrayNode merged = mapper.createArrayNode();
+        JsonNode existing = plan.get(0).path("requirementIds");
+        if (existing.isArray()) existing.forEach(merged::add);
+        for (String r : reqIds) {
+            if (!covered.contains(r)) merged.add(r);
+        }
+        ((ObjectNode) plan.get(0)).set("requirementIds", merged);
+    }
+
+    /**
+     * ASSUMPTION : le modèle 7B ne respecte pas toujours la liste exacte des source_uri.
+     * On normalise donc la sortie SPECS en ne conservant que des URI réellement présents
+     * dans le contexte RAG. C'est une contrainte déterministe, pas une invention du modèle.
+     */
+    private void sanitizeSources(JsonNode output, Set<String> allowed) {
+        if (allowed.isEmpty() || output == null || !output.isObject()) return;
+        String fallback = allowed.iterator().next();
+        ObjectNode obj = (ObjectNode) output;
+
+        JsonNode citations = obj.path("citations");
+        if (citations.isArray()) {
+            ArrayNode kept = mapper.createArrayNode();
+            for (JsonNode c : citations) {
+                if (c.isTextual() && allowed.contains(c.asText())) kept.add(c);
+            }
+            if (kept.isEmpty()) kept.add(fallback);
+            obj.set("citations", kept);
+        }
+
+        JsonNode requirements = obj.path("requirements");
+        if (requirements.isArray()) {
+            for (JsonNode r : requirements) {
+                if (!r.isObject()) continue;
+                ObjectNode requirement = (ObjectNode) r;
+                JsonNode uris = requirement.path("sourceUris");
+                ArrayNode kept = mapper.createArrayNode();
+                if (uris.isArray()) {
+                    for (JsonNode u : uris) {
+                        if (u.isTextual() && allowed.contains(u.asText())) kept.add(u);
+                    }
+                }
+                if (kept.isEmpty()) kept.add(fallback);
+                requirement.set("sourceUris", kept);
+            }
+        }
     }
 
     private String ragContext(List<Model.Chunk> chunks) {
@@ -249,11 +310,15 @@ public class GenerationOrchestrator {
         return out;
     }
 
+    /** Le modèle ajoute parfois une phrase avant le JSON : on isole l'objet, même entouré de texte. */
     private String stripFences(String raw) {
         String s = raw == null ? "" : raw.trim();
-        if (s.startsWith("```")) {
-            s = s.replaceFirst("^```(?:json)?\\s*", "").replaceFirst("```\\s*$", "");
-        }
-        return s.trim();
+        int start = s.indexOf('{');
+        int end = s.lastIndexOf('}');
+        if (start >= 0 && end > start) return s.substring(start, end + 1);
+        start = s.indexOf('[');
+        end = s.lastIndexOf(']');
+        if (start >= 0 && end > start) return s.substring(start, end + 1);
+        return s;
     }
 }

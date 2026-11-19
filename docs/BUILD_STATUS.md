@@ -46,11 +46,21 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - [x] **Lot 0** — README, `.gitignore`, ce fichier, guide d'installation Windows.
 - [x] **Lot 1** — squelette `factory-api` (Java 21, Spring Boot, Spring AI), schémas JSON des 5 agents, prompts `v1`, SQL complet. Voir `docs/LOT1_NOTES.md`.
 - [x] **Lot 2** — `rag-service` FastAPI (ingestion, chunking, embedding, retrieval, `/context/build`). Voir `docs/LOT2_NOTES.md`.
-- [ ] **Lot 3** — boucle generate/check/retry réelle + `check-runner` Docker + normaliseur d'erreurs.
-- [ ] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`).
+- [ ] **Lot 3** — boucle generate/check/retry réelle + `check-runner` Docker + normaliseur d'erreurs. **Code écrit, TC-01 en cours de validation.**
+- [ ] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Code écrit (branche + push + Draft PR via API si `PFE_GITHUB_TOKEN`, sinon URL de comparaison) ; `.github/workflows` restent à faire.**
 - [ ] **Lot 5** — UI Angular (requête, specs, diff, revue, validation, suivi).
 - [ ] **Lot 6** — harnais d'évaluation (10–15 tâches, deux modèles, baseline manuelle).
 - [ ] **Lot 7** — docs françaises, rapport, mock defense (Parts 3–6 à livrer quand tu dis `continue`).
+
+## Changements du 2026-11-19 (Lots 3–4, en validation)
+
+- L'API écoute sur **8081**, pas 8080 : le port 8080 est occupé par l'écouteur Oracle `TNSLSNR.EXE`. On ne touche pas à Oracle. Surcharge possible : `PFE_API_PORT`.
+- `seed.sql` ajoute 3 utilisateurs locaux fictifs et les clés `ollama-local` / `ollama-embed-local` (FK obligatoires).
+- `RagClient` réel (`/search` sur le service local), `RepoClient` réel (clone superficiel dans `workspaces/`), `CheckClient` Docker `--network none`, `ScmClient` GitHub (branche + commit + push, Draft PR si token).
+- Bugs corrigés en cours de route : séparateur SQL `;;` pour Spring, `created_at` en `Timestamp`, casts des colonnes `enum` PostgreSQL, casse des noms de stages dans les validateurs, placeholder `{{TASK}}` non renseigné, consigne « ne pas recopier le schéma » ajoutée au prompt.
+- `/error` rendu public pour ne plus masquer les 500 en 403.
+- `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
+- Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
 
 ## Règles pour moi
 

@@ -3,6 +3,7 @@ package com.pfe.factory.api;
 import com.pfe.factory.audit.AuditService;
 import com.pfe.factory.config.FactoryProperties;
 import com.pfe.factory.domain.RunRepository;
+import com.pfe.factory.workflow.ExecutionRegistry;
 import com.pfe.factory.workflow.GenerationOrchestrator;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -13,6 +14,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -22,14 +24,17 @@ public class FactoryController {
     private final JdbcTemplate jdbc;
     private final FactoryProperties props;
     private final AuditService audit;
+    private final ExecutionRegistry executions;
 
     public FactoryController(RunRepository repo, GenerationOrchestrator orchestrator,
-                             JdbcTemplate jdbc, FactoryProperties props, AuditService audit) {
+                             JdbcTemplate jdbc, FactoryProperties props, AuditService audit,
+                             ExecutionRegistry executions) {
         this.repo = repo;
         this.orchestrator = orchestrator;
         this.jdbc = jdbc;
         this.props = props;
         this.audit = audit;
+        this.executions = executions;
     }
 
     public record NewRequest(String title, String businessText, String targetApp,
@@ -54,13 +59,39 @@ public class FactoryController {
     }
 
     @PostMapping("/runs/{runId}/execute")
-    public ResponseEntity<Map<String, Object>> execute(@PathVariable UUID runId) throws Exception {
-        var pr = orchestrator.execute(runId);
+    public ResponseEntity<Map<String, Object>> execute(@PathVariable UUID runId) {
+        if ("RUNNING".equals(executions.get(runId).status())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(Map.of("runId", runId, "status", "RUNNING",
+                            "message", "exécution déjà en cours"));
+        }
+        executions.start(runId);
+        CompletableFuture.runAsync(() -> {
+            try {
+                executions.done(runId, orchestrator.execute(runId));
+            } catch (Throwable t) {
+                executions.fail(runId, t);
+            }
+        });
         Map<String, Object> out = new LinkedHashMap<>();
         out.put("runId", runId);
-        out.put("status", "AWAITING_REVIEW");
-        out.put("pullRequest", Map.of("number", pr.number(), "url", pr.url(), "state", "draft"));
+        out.put("status", "RUNNING");
+        out.put("pollUrl", "/api/v1/runs/" + runId + "/execution");
         return ResponseEntity.accepted().body(out);
+    }
+
+    @GetMapping("/runs/{runId}/execution")
+    public Map<String, Object> execution(@PathVariable UUID runId) {
+        var state = executions.get(runId);
+        Map<String, Object> out = new LinkedHashMap<>();
+        out.put("runId", runId);
+        out.put("status", state.status());
+        if (state.prUrl() != null) {
+            out.put("pullRequest", Map.of("number", state.prNumber(),
+                    "url", state.prUrl(), "state", "draft"));
+        }
+        if (state.error() != null) out.put("error", state.error());
+        return out;
     }
 
     @GetMapping("/runs/{runId}")
@@ -81,7 +112,7 @@ public class FactoryController {
 
     @PostMapping("/runs/{runId}/approve")
     public Map<String, Object> approve(@PathVariable UUID runId, @Valid @RequestBody Approval body) {
-        jdbc.update("insert into approval(run_id,approver_id,decision,comment) values(?,?,?,?)",
+        jdbc.update("insert into approval(run_id,approver_id,decision,comment) values(?,?,?::review_decision,?)",
                 runId, body.approverId(), body.decision(), body.comment());
         audit.append(runId, body.approverId().toString(), "HUMAN_APPROVAL", runId.toString(),
                 Map.of("decision", body.decision()));

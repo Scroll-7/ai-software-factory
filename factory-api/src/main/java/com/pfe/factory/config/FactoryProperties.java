@@ -9,6 +9,7 @@ public record FactoryProperties(
         Limits limits,
         Rag rag,
         Scm scm,
+        Workspaces workspaces,
         Telemetry telemetry) {
 
     public record Prompts(String version) {}
@@ -25,6 +26,8 @@ public record FactoryProperties(
     public record Rag(String baseUrl) {}
 
     public record Scm(String defaultRepo, String fakeExposerRepo) {}
+
+    public record Workspaces(String dir) {}
 
     public record Telemetry(boolean enabled) {}
 }

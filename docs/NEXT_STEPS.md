@@ -67,8 +67,23 @@ Attendu : les lignes `bge-m3` et `qwen2.5-coder:7b`.
 ## Étape 9 — Premier lancement (en cours)
 
 ✅ RAG service démarré et corpus ingéré (6 documents / 20 chunks, recherche française OK).
+✅ Lots 3–4 écrits : `RepoClient`, `RagClient`, `CheckClient` Docker `--network none`, `ScmClient` GitHub, `seed.sql`.
+✅ API démarrée sur **http://127.0.0.1:8081** (pas 8080 : ce port est occupé par Oracle `TNSLSNR.EXE`, on ne l'arrête pas).
 
-Reste avant la requête complète TC-01 : implémenter les Lots 3–4 (RepoClient, CheckClient Docker `--network none`, ScmClient Draft PR) et seeder `app_user` + `model_config`. Le bouchon `RagClient` sera remplacé par l'appel réel à `/context/build`.
+Le test TC-01 est en cours d'exécution **asynchrone**. Pour le rejouer plus tard :
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts\tc01.ps1
+```
+
+Le script affiche `RUNNING` puis `AWAITING_REVIEW` avec l'URL de la Draft PR (ou `FAILED` avec l'erreur).
+
+---
+
+### Pour info — pourquoi 8081
+
+Sur cette machine, `Get-NetTCPConnection -LocalPort 8080` montre `TNSLSNR.EXE` (Oracle).
+L'API utilise donc `server.port: ${PFE_API_PORT:8081}`. Rien à faire de ton côté.
 
 ---
 

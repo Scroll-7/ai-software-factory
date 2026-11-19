@@ -11,6 +11,10 @@ spring:
     init:
       mode: always
       schema-locations: classpath:schema.sql
+      data-locations: classpath:seed.sql
+      # Séparateur `;;` : les blocs DO $$ ... $$ contiennent des `;` internes
+      # que le parser Spring ne sait pas ignorer avec le séparateur par défaut.
+      separator: ";;"
       continue-on-error: false
 
   # Propriétés Spring AI 1.0.x vérifiées. Tags vérifiés le 2026-11-18 :
@@ -28,7 +32,9 @@ spring:
           model: bge-m3
 
 server:
-  port: 8080
+  # 8080 est occupé sur cette machine par l'écouteur Oracle (TNSLSNR).
+  # On ne touche pas à Oracle : l'API utilise 8081, configurable par PFE_API_PORT.
+  port: ${PFE_API_PORT:8081}
 
 factory:
   prompts:
@@ -48,6 +54,8 @@ factory:
     fake-exposer-repo: Scroll-7/Fake-exposer
   rag:
     base-url: http://localhost:8000
+  workspaces:
+    dir: ${PFE_WORKSPACES:C:\factory ai\workspaces}
   telemetry:
     enabled: false
 

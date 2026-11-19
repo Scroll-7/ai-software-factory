@@ -15,7 +15,8 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/v1/auth/**").permitAll()
+                // /error doit rester public : sinon une erreur 500 est masquée en 403.
+                .requestMatchers("/api/v1/auth/**", "/error").permitAll()
                 .anyRequest().authenticated())
             .addFilterBefore(jwt, UsernamePasswordAuthenticationFilter.class);
         return http.build();

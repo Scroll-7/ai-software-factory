@@ -45,3 +45,6 @@ docker-data/
 
 # Résultats bruts volumineux
 evaluation/results/raw/
+
+# Logs locaux et jetons de développement générés (ne jamais committer)
+logs/

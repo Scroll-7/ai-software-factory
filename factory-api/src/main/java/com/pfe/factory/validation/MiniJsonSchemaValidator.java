@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
@@ -29,7 +30,7 @@ public class MiniJsonSchemaValidator {
     }
 
     public List<String> validate(String stage, JsonNode node) {
-        return validate(node, schemas.get(stage), "$");
+        return validate(node, schemas.get(stage.toLowerCase(Locale.ROOT)), "$");
     }
 
     private List<String> validate(JsonNode n, JsonNode s, String path) {

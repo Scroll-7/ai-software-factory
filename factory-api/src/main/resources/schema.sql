@@ -4,32 +4,20 @@
 -- (source : fiche officielle BAAI/bge-m3). Ne PAS changer après le premier INSERT :
 -- cela imposerait un re-embedding complet.
 
-CREATE EXTENSION IF NOT EXISTS vector;
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS vector;;
+CREATE EXTENSION IF NOT EXISTS pgcrypto;;
 
-DO $$ BEGIN
-  CREATE TYPE request_status AS ENUM
-    ('NEW','RUNNING','AWAITING_REVIEW','APPROVED','REJECTED','MERGED','DEPLOYED','FAILED');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+-- Les blocs DO tiennent sur UNE ligne : le séparateur Spring est `;;`, les `;` internes
+-- ne doivent donc jamais finir une ligne (sinon Spring couperait le bloc en deux).
+DO $$ BEGIN CREATE TYPE request_status AS ENUM ('NEW','RUNNING','AWAITING_REVIEW','APPROVED','REJECTED','MERGED','DEPLOYED','FAILED'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
-DO $$ BEGIN
-  CREATE TYPE stage_name AS ENUM
-    ('SPECS','DESIGN','CODE','TESTS','REVIEW','GITLAB_MR','CI','STAGING');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE stage_name AS ENUM ('SPECS','DESIGN','CODE','TESTS','REVIEW','GITLAB_MR','CI','STAGING'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
-DO $$ BEGIN
-  CREATE TYPE stage_status AS ENUM
-    ('PENDING','RUNNING','SUCCEEDED','FAILED','SKIPPED','AWAITING_HUMAN');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE stage_status AS ENUM ('PENDING','RUNNING','SUCCEEDED','FAILED','SKIPPED','AWAITING_HUMAN'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
-DO $$ BEGIN
-  CREATE TYPE artifact_kind AS ENUM
-    ('SPEC_JSON','ARCHITECTURE_JSON','PATCH','FILE','TEST_FILE','REVIEW_JSON');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE artifact_kind AS ENUM ('SPEC_JSON','ARCHITECTURE_JSON','PATCH','FILE','TEST_FILE','REVIEW_JSON'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
-DO $$ BEGIN
-  CREATE TYPE review_decision AS ENUM ('APPROVED','CHANGES_REQUESTED','REJECTED');
-EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN CREATE TYPE review_decision AS ENUM ('APPROVED','CHANGES_REQUESTED','REJECTED'); EXCEPTION WHEN duplicate_object THEN NULL; END $$;;
 
 CREATE TABLE IF NOT EXISTS app_user (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -38,7 +26,7 @@ CREATE TABLE IF NOT EXISTS app_user (
   role          text NOT NULL CHECK (role IN ('REQUESTER','REVIEWER','ADMIN')),
   password_hash text NOT NULL,
   created_at    timestamptz NOT NULL DEFAULT now()
-);
+);;
 
 CREATE TABLE IF NOT EXISTS model_config (
   key            text PRIMARY KEY,
@@ -52,7 +40,7 @@ CREATE TABLE IF NOT EXISTS model_config (
   temperature    numeric(4,3),
   is_active      boolean NOT NULL DEFAULT false,
   created_at     timestamptz NOT NULL DEFAULT now()
-);
+);;
 
 CREATE TABLE IF NOT EXISTS change_request (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -65,8 +53,8 @@ CREATE TABLE IF NOT EXISTS change_request (
   requester_id  uuid NOT NULL REFERENCES app_user(id),
   created_at    timestamptz NOT NULL DEFAULT now(),
   updated_at    timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_change_request_status ON change_request(status, created_at DESC);
+);;
+CREATE INDEX IF NOT EXISTS idx_change_request_status ON change_request(status, created_at DESC);;
 
 CREATE TABLE IF NOT EXISTS requirement_item (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -77,7 +65,7 @@ CREATE TABLE IF NOT EXISTS requirement_item (
   acceptance_criteria jsonb NOT NULL DEFAULT '[]'::jsonb,
   source_snippet      text,
   UNIQUE (request_id, ordinal)
-);
+);;
 
 CREATE TABLE IF NOT EXISTS generation_run (
   id                  uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -94,8 +82,8 @@ CREATE TABLE IF NOT EXISTS generation_run (
   config              jsonb NOT NULL DEFAULT '{}'::jsonb,
   started_at          timestamptz,
   finished_at         timestamptz
-);
-CREATE INDEX IF NOT EXISTS idx_run_request ON generation_run(request_id, started_at DESC);
+);;
+CREATE INDEX IF NOT EXISTS idx_run_request ON generation_run(request_id, started_at DESC);;
 
 CREATE TABLE IF NOT EXISTS pipeline_event (
   id         bigserial PRIMARY KEY,
@@ -105,8 +93,8 @@ CREATE TABLE IF NOT EXISTS pipeline_event (
   message    text,
   payload    jsonb NOT NULL DEFAULT '{}'::jsonb,
   created_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_event_run ON pipeline_event(run_id, created_at);
+);;
+CREATE INDEX IF NOT EXISTS idx_event_run ON pipeline_event(run_id, created_at);;
 
 CREATE TABLE IF NOT EXISTS agent_output (
   id                bigserial PRIMARY KEY,
@@ -123,8 +111,8 @@ CREATE TABLE IF NOT EXISTS agent_output (
   validated         boolean NOT NULL DEFAULT false,
   validation_errors jsonb NOT NULL DEFAULT '[]'::jsonb,
   created_at        timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_agent_output_run ON agent_output(run_id, stage, attempt);
+);;
+CREATE INDEX IF NOT EXISTS idx_agent_output_run ON agent_output(run_id, stage, attempt);;
 
 CREATE TABLE IF NOT EXISTS artifact (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -136,7 +124,7 @@ CREATE TABLE IF NOT EXISTS artifact (
   content       text NOT NULL,
   created_at    timestamptz NOT NULL DEFAULT now(),
   UNIQUE (run_id, stage, path, content_sha256)
-);
+);;
 
 CREATE TABLE IF NOT EXISTS check_result (
   id          bigserial PRIMARY KEY,
@@ -150,7 +138,7 @@ CREATE TABLE IF NOT EXISTS check_result (
   stderr_tail text,
   duration_ms integer,
   created_at  timestamptz NOT NULL DEFAULT now()
-);
+);;
 
 CREATE TABLE IF NOT EXISTS traceability_link (
   id             bigserial PRIMARY KEY,
@@ -161,7 +149,7 @@ CREATE TABLE IF NOT EXISTS traceability_link (
   line_range     text,
   rationale      text,
   UNIQUE (run_id, requirement_id, artifact_id, file_path)
-);
+);;
 
 CREATE TABLE IF NOT EXISTS approval (
   id          bigserial PRIMARY KEY,
@@ -171,7 +159,7 @@ CREATE TABLE IF NOT EXISTS approval (
   comment     text,
   decided_at  timestamptz NOT NULL DEFAULT now(),
   UNIQUE (run_id, approver_id)
-);
+);;
 
 CREATE TABLE IF NOT EXISTS audit_log (
   id         bigserial PRIMARY KEY,
@@ -183,8 +171,8 @@ CREATE TABLE IF NOT EXISTS audit_log (
   prev_hash  char(64),
   hash       char(64) NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now()
-);
-CREATE INDEX IF NOT EXISTS idx_audit_run ON audit_log(run_id, created_at);
+);;
+CREATE INDEX IF NOT EXISTS idx_audit_run ON audit_log(run_id, created_at);;
 
 CREATE TABLE IF NOT EXISTS rag_document (
   id            uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -198,7 +186,7 @@ CREATE TABLE IF NOT EXISTS rag_document (
   is_active     boolean NOT NULL DEFAULT true,
   created_at    timestamptz NOT NULL DEFAULT now(),
   UNIQUE (source_uri, version)
-);
+);;
 
 CREATE TABLE IF NOT EXISTS rag_chunk (
   id          bigserial PRIMARY KEY,
@@ -211,10 +199,10 @@ CREATE TABLE IF NOT EXISTS rag_chunk (
   embedding   vector(1024) NOT NULL,
   created_at  timestamptz NOT NULL DEFAULT now(),
   UNIQUE (document_id, ordinal)
-);
+);;
 CREATE INDEX IF NOT EXISTS idx_rag_chunk_embedding
-  ON rag_chunk USING hnsw (embedding vector_cosine_ops);
-CREATE INDEX IF NOT EXISTS idx_rag_chunk_tsv ON rag_chunk USING gin (content_tsv);
-CREATE INDEX IF NOT EXISTS idx_rag_chunk_doc ON rag_chunk(document_id);
+  ON rag_chunk USING hnsw (embedding vector_cosine_ops);;
+CREATE INDEX IF NOT EXISTS idx_rag_chunk_tsv ON rag_chunk USING gin (content_tsv);;
+CREATE INDEX IF NOT EXISTS idx_rag_chunk_doc ON rag_chunk(document_id);;
 
-ANALYZE rag_chunk;
+ANALYZE rag_chunk;;

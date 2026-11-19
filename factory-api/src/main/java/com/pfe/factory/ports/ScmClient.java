@@ -5,6 +5,6 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ScmClient {
-    Model.PrRef createDraftPr(UUID runId, String branch, String title, String body,
+    Model.PrRef createDraftPr(UUID runId, String repo, String branch, String title, String body,
                               List<Model.GeneratedFile> files);
 }

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -26,14 +27,18 @@ public class DomainValidator {
             + "innerHTML|dangerouslySetInnerHTML|pickle\\.loads|subprocess|API_KEY)",
             Pattern.CASE_INSENSITIVE);
 
+    // On ne bloque qu'une DEMANDE de données réelles / de production, pas une question méta
+    // qui cite la règle de sécurité ("comment refuser les données réelles ?").
     private static final Pattern BLOCKING_WORDS = Pattern.compile(
-            "confidentiel|données? réelles?|cv réel|production", Pattern.CASE_INSENSITIVE);
+            "confidentiel|cv réel|données? réelles? (?:à|de|sur|contenir|utiliser|fournir|requises?)"
+                    + "|en production|appel(?:s)? (?:réseau )?externe(?:s)? (?:requis|nécessaire|obligatoire)",
+            Pattern.CASE_INSENSITIVE);
 
     public List<String> validate(String stage, JsonNode o, Context c) {
         List<String> errors = new ArrayList<>();
         if (o == null || !o.isObject()) return List.of("sortie: objet JSON attendu");
 
-        switch (stage) {
+        switch (stage.toLowerCase(Locale.ROOT)) {
             case "specs" -> {
                 for (String uri : textArray(o.path("citations"))) {
                     if (!c.allowedSourceUris().contains(uri)) errors.add("citation inconnue: " + uri);

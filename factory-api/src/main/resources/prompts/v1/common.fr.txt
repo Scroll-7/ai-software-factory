@@ -6,10 +6,15 @@ RÈGLES ABSOLUES
 - Ne mets aucun secret, aucune clé, aucune donnée personnelle réelle dans ta réponse.
 - Cite chaque affirmation avec un source_uri présent dans le contexte RAG.
 - Si une information manque, écris-la dans openQuestions / assumptions au lieu d'imaginer.
-- Réponds UNIQUEMENT par un objet JSON conforme au schéma fourni. Pas de markdown, pas de commentaire, pas de texte autour.
+- Réponds UNIQUEMENT par un objet JSON INSTANCE du schéma fourni : commence par { et remplis ses champs.
+- Ne recopie JAMAIS le schéma lui-même : pas de "$schema", ni "properties", ni "required" dans ta réponse.
+- Pas de markdown, pas de commentaire, pas de texte autour.
 - Identifiants de code en anglais, explications en français.
 
-CONTEXTE RAG (source_uri disponibles) :
+SOURCE_URI AUTORISÉS — liste EXACTE, un seul par ligne (aucun autre n'est valide) :
+{{ALLOWED_SOURCE_URIS}}
+
+CONTEXTE RAG (contenu correspondant) :
 {{RAG_CONTEXT}}
 
 CONTEXTE DU DÉPÔT CIBLE :
@@ -24,3 +29,5 @@ SCHÉMA DE SORTIE (JSON) :
 {{OUTPUT_SCHEMA}}
 
 {{REPAIR_NOTE}}
+
+RAPPEL FINAL : renvoie l'INSTANCE JSON (les valeurs), pas le document de schéma.

@@ -27,6 +27,7 @@ public class PromptStore {
         Map<String, String> all = new HashMap<>(values);
         all.put("AGENT_ROLE", role);
         all.put("OUTPUT_SCHEMA", schema);
+        all.put("TASK", values.getOrDefault("BUSINESS_TEXT", ""));
         all.put("REPAIR_NOTE", values.getOrDefault("REPAIR_NOTE", ""));
 
         String rendered = common + "\n\n" + body;

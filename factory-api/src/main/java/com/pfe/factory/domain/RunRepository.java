@@ -58,7 +58,11 @@ public class RunRepository {
             i++;
             try {
                 jdbc.update("insert into requirement_item(request_id,ordinal,external_ref,text,acceptance_criteria,source_snippet) "
-                                + "values(?,?,?,?,?,?)",
+                                + "values(?,?,?,?,?::jsonb,?) "
+                        + "on conflict (request_id, ordinal) do update set "
+                        + "external_ref=excluded.external_ref, text=excluded.text, "
+                        + "acceptance_criteria=excluded.acceptance_criteria, "
+                        + "source_snippet=excluded.source_snippet",
                         r.get("request_id"), i,
                         req.path("id").asText(),
                         req.path("text").asText(),
@@ -83,7 +87,7 @@ public class RunRepository {
         try {
             jdbc.update("insert into agent_output(run_id,stage,attempt,prompt_version,model_key,input_ref,output,"
                             + "tokens_in,tokens_out,latency_ms,validated,validation_errors) "
-                            + "values(?,?,?,?,?,?,?::jsonb,?,?,?,?,?::jsonb)",
+                            + "values(?,?::stage_name,?,?,?,?,?::jsonb,?,?,?,?,?::jsonb)",
                     runId, stage, attempt, "v1", modelKey, inputRef,
                     mapper.writeValueAsString(output), tokensIn, tokensOut, latencyMs,
                     errors.isEmpty(), mapper.writeValueAsString(errors));
@@ -94,14 +98,14 @@ public class RunRepository {
 
     public void saveArtifacts(UUID runId, String stage, String kind, List<Model.GeneratedFile> files) {
         for (Model.GeneratedFile f : files) {
-            jdbc.update("insert into artifact(run_id,stage,kind,path,content_sha256,content) values(?,?,?,?,?,?) "
+            jdbc.update("insert into artifact(run_id,stage,kind,path,content_sha256,content) values(?,?::stage_name,?::artifact_kind,?,?,?) "
                             + "on conflict do nothing",
                     runId, stage, kind, f.path(), Hashes.sha256(f.content()), f.content());
         }
     }
 
     public void event(UUID runId, String stage, String status, String message) {
-        jdbc.update("insert into pipeline_event(run_id,stage,status,message) values(?,?,?,?)",
+        jdbc.update("insert into pipeline_event(run_id,stage,status,message) values(?,?::stage_name,?::stage_status,?)",
                 runId, stage, status, message);
     }
 

@@ -6,6 +6,10 @@ RÈGLES SPÉCIFIQUES
 - Entre 1 et 8 exigences. Chaque id est R1, R2, ... sans saut.
 - Chaque exigence a au moins 1 critère d'acceptation observable.
 - Chaque exigence cite au moins un source_uri du contexte RAG.
+- CRITIQUE : dans `sourceUris` et `citations`, recopie UNIQUEMENT des valeurs prises telles quelles dans la section « SOURCE_URI AUTORISÉS » ci-dessus.
+  N'invente aucun préfixe : `synthetic://public/i18n/fr.json` est FAUX. N'y mets jamais un chemin de fichier du dépôt comme `public/i18n/fr.json`.
+- Chaque exigence doit avoir au moins un élément dans `sourceUris` (tableau non vide).
+- `openQuestions` doit contenir des questions courtes et concrètes. Ne recopie pas les règles de sécurité dans une question.
 - Le résumé et les exigences sont en français.
 - Détecte et refuse tout besoin qui exigerait un appel réseau externe ou des données réelles :
   écris la question correspondante dans openQuestions, n'invente rien.
