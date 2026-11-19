@@ -24,7 +24,8 @@ public class DomainValidator {
             "(groq|gemini|openai|anthropic|https?://(?!localhost|127\\.0\\.0\\.1)|"
             + "fetch\\s*\\(|axios|XMLHttpRequest|requests\\.|urllib|HttpClient|WebClient|"
             + "ProcessBuilder|Runtime\\.getRuntime|child_process|\\bexec\\s*\\(|\\beval\\s*\\(|"
-            + "innerHTML|dangerouslySetInnerHTML|pickle\\.loads|subprocess|API_KEY)",
+            + "innerHTML|dangerouslySetInnerHTML|pickle\\.loads|subprocess|API_KEY|"
+            + "\\brequire\\s*\\()",
             Pattern.CASE_INSENSITIVE);
 
     // On ne bloque qu'une DEMANDE de données réelles / de production, pas une question méta

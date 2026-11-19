@@ -9,7 +9,8 @@ RÈGLES SPÉCIFIQUES
 - Pour fake-exposer : lis public/i18n/fr.json et public/i18n/en.json avec node:fs et vérifie UNIQUEMENT que leurs ensembles de clés sont égaux, triés, et valent exactement ["error","goodbye","welcome"].
   Ne teste AUCUNE valeur traduite précise ("Bonjour", "Hello", ...) : seules les clés comptent.
 - CRITIQUE : n'importe AUCUN module absent du dépôt cible ; en particulier pas de `services/i18n.js` (fichier inexistant).
-  N'utilise que node:test, node:assert et node:fs.
+  N'utilise que node:test, node:assert et node:fs. Le dépôt est en ESM : n'écris JAMAIS `require(...)`.
+  Lis les JSON avec `import fs from 'node:fs'` puis `fs.readFileSync('public/i18n/fr.json','utf-8')` (chemin depuis la racine).
 - Pour demo-hr-app : vérifie qu'un score et une explication sont produits ET que l'interface indique que la décision revient au recruteur.
 - Aucune assertion sur un attribut protégé.
 

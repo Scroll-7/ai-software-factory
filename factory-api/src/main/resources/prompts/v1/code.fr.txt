@@ -23,7 +23,10 @@ RÈGLES SPÉCIFIQUES
 - Interdits : appel réseau sortant, clé API, eval, innerHTML, ProcessBuilder, child_process, subprocess, TODO/FIXME.
 - CRITIQUE : n'importe AUCUN module absent de « CONTEXTE DU DÉPÔT CIBLE » et de la liste des fichiers à produire.
   En particulier, n'écris PAS `import ... from '../services/i18n.js'` : ce fichier n'existe pas.
-  Un test i18n lit directement public/i18n/fr.json et public/i18n/en.json avec node:fs.
+  Un test i18n lit directement public/i18n/fr.json et public/i18n/en.json avec :
+  `import fs from 'node:fs'; const fr = JSON.parse(fs.readFileSync('public/i18n/fr.json','utf-8'));`
+  Le dépôt est en ESM : n'écris JAMAIS `require(...)`, même pour lire un JSON.
+  Le chemin est depuis la racine du dépôt : 'public/i18n/fr.json' (pas '../../public/...').
 - Remplis selfCheck honnêtement : chaque case sera revérifiée par le code.
 - Écris d'abord explanation (1 à 3 lignes), puis content.
 
