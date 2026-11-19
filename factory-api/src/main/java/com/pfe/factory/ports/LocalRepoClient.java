@@ -22,4 +22,9 @@ public class LocalRepoClient implements RepoClient {
     public String read(String repo, String path) {
         return repos.read(repo, path);
     }
+
+    @Override
+    public void resetToDefault(String repo) {
+        repos.resetToDefault(repo);
+    }
 }

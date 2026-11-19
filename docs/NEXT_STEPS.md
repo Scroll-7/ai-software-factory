@@ -72,6 +72,8 @@ Attendu : les lignes `bge-m3` et `qwen2.5-coder:7b`.
 
 ✅ **TC-01 est vert** (2026-11-19) : `SPECS → DESIGN → CODE → TESTS → REVIEW → AWAITING_REVIEW`. Branche poussée sur `Scroll-7/Fake-exposer`, aucune fusion.
 
+✅ **Replay vert après ajout du workflow cible et de `modelKey`** (run `098b26f5-58d3-4dce-a88c-6a37871a4aa1`). Le workflow déterministe `.github/workflows/factory-generated-ci.yml` est bien présent dans la branche, sans écraser le `ci.yml` existant. Un premier essai avait échoué en DESIGN : le workspace cible était resté sur la branche du run précédent, faisant croire que les fichiers générés existaient déjà. Corrigé : `RepoClient.resetToDefault()` remet le workspace sur une branche propre avant chaque run.
+
 Rejouer le test :
 
 ```powershell
@@ -84,8 +86,8 @@ Le script affiche `RUNNING` puis `AWAITING_REVIEW` avec l'URL de comparaison Git
 
 Comme `PFE_GITHUB_TOKEN` n'est pas défini, l'API renvoie une URL de comparaison. Ouvre-la dans GitHub, choisis **Create pull request**, puis **Draft pull request**. Ne fusionne pas.
 
-Dernière URL obtenue :
-`https://github.com/Scroll-7/Fake-exposer/compare/main...factory%2Fad0b83c6-2c49-4f8f-9375-15f756ba7573%2F4e428258-dbf0-45a3-b04b-b5dc09e3f3f4`
+Dernière URL obtenue (replay du 2026-11-19) :
+`https://github.com/Scroll-7/Fake-exposer/compare/main...factory%2Fb21cb3bc-d068-4943-a7eb-5e4c0f17dc99%2F098b26f5-58d3-4dce-a88c-6a37871a4aa1`
 
 ## Étape 11 — Webhook et protection de branche (lecture)
 

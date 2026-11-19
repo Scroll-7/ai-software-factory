@@ -229,7 +229,7 @@ Preuves réelles au 2026-11-19 :
 - Build Angular vert, page servie sur 4200 sans erreur console, connexion locale testée.
 - Rapport d'évaluation généré avec une ligne synthétique (supprimée ensuite).
 
-**VERIFY :** TC-01 n'a pas été rejoué depuis l'ajout du template de workflow cible et du `modelKey`. Le replay est le prochain contrôle de non-régression à faire.
+**VERIFY (clos) :** TC-01 a été rejoué le 2026-11-19 (run `098b26f5-58d3-4dce-a88c-6a37871a4aa1`). Le workflow cible déterministe est présent dans la branche poussée. Un bug de workspace résiduel entre deux runs a été trouvé et corrigé par `RepoClient.resetToDefault()` : chaque run repart désormais d'une branche par défaut propre.
 
 Limites connues : compteurs de jetons non remontés par l'API (0 dans `agent_output`), qualité non notée automatiquement, webhook public non configuré, modèle 3B absent, 24 runs d'évaluation non exécutés.
 

@@ -100,7 +100,7 @@ SPECS ✅ → DESIGN ✅ → CODE ✅ (4 fichiers) → TESTS ✅ (Docker) → RE
 - UI Angular 21.2.26 / TypeScript 5.9 : `npm run build` réussi (bundle initial 208,62 kB), page servie sur `:4200`, connexion locale testée dans le navigateur.
 - Harnais : 12 tâches validées en `dry-run`, 0 appel réseau, rapport généré avec une ligne synthétique puis nettoyé.
 
-**VERIFY :** TC-01 n'a pas été rejoué depuis l'ajout du template de workflow cible et du paramètre `modelKey`. C'est le prochain test de non-régression.
+**VERIFY (clos) :** TC-01 a été rejoué le 2026-11-19 sur le code actuel : run `098b26f5-58d3-4dce-a88c-6a37871a4aa1` vert, avec le template de workflow cible vérifié dans la branche poussée (`cef9eaf…`). Le premier essai avait révélé un bug de workspace résiduel, corrigé par `RepoClient.resetToDefault()`. Voir `docs/BUILD_STATUS.md`.
 
 ---
 

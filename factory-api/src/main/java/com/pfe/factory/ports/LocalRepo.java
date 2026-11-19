@@ -106,6 +106,18 @@ public class LocalRepo {
         return r.exit() == 1;
     }
 
+    /**
+     * Remet le workspace sur une branche par défaut PROPRE avant chaque run.
+     * Sans cela, le run suivant voit les fichiers du run précédent comme existants
+     * (CREATE refusé) et base sa nouvelle branche sur l'ancienne.
+     */
+    public void resetToDefault(String repo) {
+        String branch = defaultBranch(repo);
+        git(repo, "checkout", "-f", branch);
+        git(repo, "reset", "--hard", "origin/" + branch);
+        git(repo, "clean", "-fd");
+    }
+
     public String defaultBranch(String repo) {
         Result r = run(ensureClone(repo), "git", "symbolic-ref", "--short",
                 "refs/remotes/origin/HEAD");

@@ -73,6 +73,9 @@ public class GenerationOrchestrator {
         String modelName = repo.modelName(modelKey);
         String businessText = repo.requestText(runId);
 
+        // Chaque run part d'un workspace propre : sinon les fichiers du run précédent
+        // seraient considérés comme existants et les actions CREATE seraient refusées.
+        repoClient.resetToDefault(repoName);
         List<Model.Chunk> chunks = ragClient.search(targetApp + " standard local", "STANDARD", 5);
         String ragContext = ragContext(chunks);
         List<String> tree = repoClient.tree(repoName, "HEAD");

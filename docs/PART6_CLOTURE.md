@@ -47,6 +47,9 @@ Docs d'accompagnement : `docs/BUILD_STATUS.md`, `docs/NEXT_STEPS.md`, `docs/GITH
 | UI | `npm run build` vert, page servie sur `:4200`, connexion locale OK dans le navigateur |
 | Harnais | `list` et `dry-run` verts (12 tâches, 0 appel réseau) ; rapport généré puis nettoyé |
 | CI usine | ajout du build Angular dans `.github/workflows/ci.yml` |
+| Replay TC-01 (V1) | run `098b26f5-58d3-4dce-a88c-6a37871a4aa1` vert ; branche `cef9eaf…` vérifiée par `git ls-remote` ; `.github/workflows/factory-generated-ci.yml` présent à côté du `ci.yml` existant ; aucun `MERGE`/`DEPLOY` en audit |
+
+**Bug trouvé et corrigé pendant le replay :** le premier essai (`9c546bdc…`) a échoué en DESIGN. Le workspace `workspaces/Fake-exposer` était resté sur la branche générée par le premier TC-01 : `git ls-files` y voyait `public/i18n/fr.json`, `en.json` et `test/i18n.test.js` comme existants, donc le validateur refusait les actions `CREATE`. Correction : `RepoClient.resetToDefault()` remet le workspace sur la branche par défaut propre (`checkout -f`, `reset --hard origin/<branche>`, `clean -fd`) au début de chaque run. Cela garantit aussi que chaque nouvelle branche part de la branche par défaut, et non de la branche générée précédente.
 
 `master` est synchronisé avec `origin/master` à chaque livraison.
 
@@ -56,7 +59,7 @@ Docs d'accompagnement : `docs/BUILD_STATUS.md`, `docs/NEXT_STEPS.md`, `docs/GITH
 
 | # | Point | Action requise |
 |---|---|---|
-| V1 | TC-01 n'a pas été rejoué depuis l'ajout du template de workflow cible et du paramètre `modelKey`. | Relancer `powershell -ExecutionPolicy Bypass -File scripts\tc01.ps1`. |
+| ~~V1~~ | **Clos le 2026-11-19** : TC-01 rejoué, run `098b26f5…` vert, workflow cible présent dans la branche. | Aucune. Voir le bug trouvé et corrigé au §3. |
 | V2 | Le modèle `qwen2.5-coder:3b` n'est pas installé ; la clé `ollama-local-3b` est déclarée **inactive**. | Toi : `ollama pull qwen2.5-coder:3b`, puis demander l'activation de la clé. |
 | V3 | Aucun run d'évaluation réel n'a été lancé (24 runs = 24 branches). | Toi : lancer les runs un par un selon `docs/eval/README.md`. |
 | V4 | Le webhook public ne peut pas joindre `127.0.0.1` depuis GitHub. | Optionnel : tunnel/URL publique, hors cadre 100 % local. |

@@ -62,6 +62,11 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
 
+## Replay TC-01 et correction workspace — 2026-11-19
+
+- **V1 clos** : TC-01 rejoué avec succès sur le code actuel (workflow cible + `modelKey`). Run `098b26f5-58d3-4dce-a88c-6a37871a4aa1` : `SPECS → DESIGN → CODE → TESTS → REVIEW → GITHUB_PR/AWAITING_HUMAN`. Branche `cef9eaf…` vérifiée par `git ls-remote` sur `Scroll-7/Fake-exposer`. Le template `.github/workflows/factory-generated-ci.yml` est bien présent dans la branche, sans écraser le `ci.yml` existant. Audit : `DRAFT_PR_CREATED`, aucune ligne `MERGE`/`DEPLOY`.
+- **Bug corrigé** : le premier essai (`9c546bdc…`) a échoué en DESIGN parce que le workspace cible restait sur la branche du run précédent ; les fichiers i18n générés étaient vus comme existants et les `CREATE` refusés. Ajout de `RepoClient.resetToDefault()` (`checkout -f`, `reset --hard origin/<branche>`, `clean -fd`) appelé au début de `execute()`. Cela garantit aussi que chaque branche générée part de la branche par défaut.
+
 ## Partie 6 — livrée le 2026-11-19
 
 Checklist de clôture : `docs/PART6_CLOTURE.md`. Livrables des six parties, lots 0–7, preuves vérifiées, 6 points `VERIFY` ouverts (V1 replay TC-01, V2 3B à installer, V3 runs d'évaluation, V4 webhook public, V5 versions, V6 jetons), actions à faire par l'utilisateur et commandes de reprise. **Les six parties sont livrées.**
