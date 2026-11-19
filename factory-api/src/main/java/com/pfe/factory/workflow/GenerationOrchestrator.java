@@ -126,7 +126,11 @@ public class GenerationOrchestrator {
         repo.saveArtifacts(runId, "CODE", "FILE", generated);
         repo.event(runId, "CODE", "SUCCEEDED", generated.size() + " fichiers générés");
 
-        Model.CheckResult result = checkClient.applyAndCheck(runId, generated);
+        List<String> parityErrors = i18nParityErrors(generated);
+        Model.CheckResult result = parityErrors.isEmpty()
+                ? checkClient.applyAndCheck(runId, generated)
+                : new Model.CheckResult(false, "I18N_PARITY", "",
+                        String.join("\n", parityErrors), "i18n-parity");
         Set<String> seenSignatures = new HashSet<>();
         int repairs = 0;
         while (!result.ok()) {
@@ -149,15 +153,26 @@ public class GenerationOrchestrator {
                     .filter(f -> f.path().equals(failingPath))
                     .map(Model.GeneratedFile::content).findFirst().orElse("");
             repair.put("CURRENT_FILE", brokenContent);
+            StringBuilder all = new StringBuilder();
+            for (Model.GeneratedFile f : generated) {
+                all.append("// FILE: ").append(f.path()).append("\n")
+                        .append(f.content()).append("\n\n");
+            }
+            repair.put("ALL_FILES", all.toString());
             repair.put("REPAIR_NOTE", "ERREUR À CORRIGER DANS " + failingPath + " (signature "
                     + digest.signature() + ")\n"
                     + String.join("\n", digest.messages()) + "\n" + digest.rawTail()
-                    + "\nCorrige UNIQUEMENT ce fichier. N'ajoute aucun import vers un module absent du dépôt.");
+                    + "\nTu peux renvoyer PLUSIEURS fichiers dans `files` (ex. les deux dictionnaires"
+                    + " et le test). Reprends les autres fichiers inchangés depuis ALL_FILES."
+                    + " N'ajoute aucun import vers un module absent du dépôt.");
             List<Model.GeneratedFile> fixedFiles = toFiles(
                     callStage("CODE", runId, repair, ctx, modelKey));
             if (!fixedFiles.isEmpty()) {
-                generated.removeIf(f -> f.path().equals(failingPath));
-                generated.add(fixedFiles.get(0));
+                Set<String> fixedPaths = fixedFiles.stream()
+                        .map(Model.GeneratedFile::path).collect(Collectors.toSet());
+                generated.removeIf(f -> fixedPaths.contains(f.path()));
+                generated.addAll(fixedFiles);
+                for (Model.GeneratedFile f : fixedFiles) codeValuesByPath.put(f.path(), repair);
             }
             result = checkClient.applyAndCheck(runId, generated);
         }
@@ -286,6 +301,34 @@ public class GenerationOrchestrator {
                 requirement.set("sourceUris", kept);
             }
         }
+    }
+
+    /** Règle métier déterministe : les deux dictionnaires i18n doivent avoir les mêmes clés. */
+    private List<String> i18nParityErrors(List<Model.GeneratedFile> files) {
+        String fr = contentOf(files, "public/i18n/fr.json");
+        String en = contentOf(files, "public/i18n/en.json");
+        if (fr == null || en == null) return List.of();
+        try {
+            Set<String> frKeys = new HashSet<>();
+            mapper.readTree(fr).fieldNames().forEachRemaining(frKeys::add);
+            Set<String> enKeys = new HashSet<>();
+            mapper.readTree(en).fieldNames().forEachRemaining(enKeys::add);
+            List<String> errors = new ArrayList<>();
+            for (String k : frKeys) {
+                if (!enKeys.contains(k)) errors.add("public/i18n/en.json: clé absente: " + k);
+            }
+            for (String k : enKeys) {
+                if (!frKeys.contains(k)) errors.add("public/i18n/fr.json: clé absente: " + k);
+            }
+            return errors;
+        } catch (Exception e) {
+            return List.of("public/i18n/fr.json: JSON invalide (" + e.getMessage() + ")");
+        }
+    }
+
+    private String contentOf(List<Model.GeneratedFile> files, String path) {
+        return files.stream().filter(f -> f.path().equals(path))
+                .map(Model.GeneratedFile::content).findFirst().orElse(null);
     }
 
     /** Retrouve le fichier fautif à partir du message d'erreur du check. */

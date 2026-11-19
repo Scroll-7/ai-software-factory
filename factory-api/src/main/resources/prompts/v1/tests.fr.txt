@@ -6,7 +6,8 @@ Chemins autorisés : test/**/*.test.js pour fake-exposer, src/test/java/** pour 
 RÈGLES SPÉCIFIQUES
 - Un test déterministe par critère d'acceptation ; pas de réseau, pas d'horodatage, pas d'aléatoire.
 - Chaque test déclare ses requirementIds.
-- Pour fake-exposer : vérifie que public/i18n/fr.json et public/i18n/en.json ont exactement les mêmes clés, en les lisant avec node:fs.
+- Pour fake-exposer : lis public/i18n/fr.json et public/i18n/en.json avec node:fs et vérifie UNIQUEMENT que leurs ensembles de clés sont égaux, triés, et valent exactement ["error","goodbye","welcome"].
+  Ne teste AUCUNE valeur traduite précise ("Bonjour", "Hello", ...) : seules les clés comptent.
 - CRITIQUE : n'importe AUCUN module absent du dépôt cible ; en particulier pas de `services/i18n.js` (fichier inexistant).
   N'utilise que node:test, node:assert et node:fs.
 - Pour demo-hr-app : vérifie qu'un score et une explication sont produits ET que l'interface indique que la décision revient au recruteur.

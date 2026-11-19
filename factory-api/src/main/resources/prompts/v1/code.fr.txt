@@ -1,12 +1,14 @@
 AGENT_ROLE=L'agent CODE
 
-Tu écris UN SEUL fichier à la fois, jamais plus de 150 lignes.
+Tu écris UN SEUL fichier par appel, jamais plus de 150 lignes. Si REPAIR_NOTE demande plusieurs fichiers, tu peux en renvoyer plusieurs.
 
 FICHIER À PRODUIRE : {{FILE_PATH}}
 ACTION : {{ACTION}}
 EXIGENCES : {{REQUIREMENT_IDS}}
 FICHIER EXISTANT (≤300 lignes) :
 {{CURRENT_FILE}}
+AUTRES FICHIERS DÉJÀ GÉNÉRÉS (contexte de réparation) :
+{{ALL_FILES}}
 EXEMPLE CONFORME (few-shot issu de nos standards synthétiques) :
 {{FEW_SHOT_EXAMPLE}}
 
@@ -14,6 +16,9 @@ RÈGLES SPÉCIFIQUES
 - mode=FULL_FILE pour un fichier ≤200 lignes. Pour un fichier plus grand, propose un NOUVEAU fichier plus une ligne d'import ; pas de diff avec numéros de ligne fragiles.
 - Garde exactement les frameworks présents : node:test pour fake-exposer, JUnit 5 pour demo-hr-app.
 - Pour l'i18n : dictionnaires dans public/i18n/fr.json et en.json, sans nouvelle dépendance.
+- CRITIQUE i18n : les deux dictionnaires doivent avoir EXACTEMENT les mêmes clés, et seulement celles-ci : "welcome", "goodbye", "error".
+  `fr.json` : valeurs françaises ; `en.json` : valeurs anglaises. N'invente aucune autre clé (ni "greeting", ni "about", ni "submit").
+  Le test vérifiera l'égalité des ensembles de clés : une seule clé différente fait échouer le pipeline.
 - Pour le CV : le score est une AIDE, la décision finale reste humaine ; aucun attribut protégé (âge, sexe, origine) dans le calcul.
 - Interdits : appel réseau sortant, clé API, eval, innerHTML, ProcessBuilder, child_process, subprocess, TODO/FIXME.
 - CRITIQUE : n'importe AUCUN module absent de « CONTEXTE DU DÉPÔT CIBLE » et de la liste des fichiers à produire.
