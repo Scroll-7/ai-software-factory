@@ -62,6 +62,14 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
 
+## Corrections cible Fake-exposer — 2026-11-19
+
+- **CI rouge réparée** : `NODE_OPTIONS=--experimental-test-coverage` provoquait un exit code 9 (drapeau interdit dans `NODE_OPTIONS`, vérifié localement). Le drapeau est désormais passé directement à `node --test --experimental-test-coverage test/*.test.js`. Commit `2eebf4b` sur `main`, aligné sur la branche de la PR.
+- **Sécurité** : `npm audit` passé de 10 vulnérabilités (1 critique, 4 high, 5 moderate) à **0**, par montée non cassante de `express` 4.22.3 / `qs` 6.16.2 dans `package-lock.json` uniquement (aucun code applicatif touché). Commit `bf791dc` sur `main`, aligné sur la PR.
+- **Checks GitHub vérifiés via API** : `main` `bf791dc` → 2/2 success ; PR #1 head `3c0f304` → **4/4 success**. Local : lint OK, 224 tests OK, `npm audit` 0.
+- **Diff PR vs main** : toujours exactement les 4 fichiers générés (i18n FR/EN, test, workflow) ; les corrections ci-dessus sont communes aux deux branches.
+- **Reste informational** : avertissement GitHub sur `actions/checkout@v4` / `actions/setup-node@v4` (Node 20 forcé en Node 24). Aucun effet fonctionnel ; migration v7 non faite (changement de version majeure d'action, sans rapport avec la démo).
+
 ## Démo Draft PR et copie générée — 2026-11-19
 
 - Parcours complet documenté dans `docs/DEMO.md`.

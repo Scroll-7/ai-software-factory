@@ -10,7 +10,8 @@ Parcours complet, prêt à rejouer. Tout est local sauf GitHub (branches et PR).
 |---|---|
 | PR Draft | [Scroll-7/Fake-exposer#1](https://github.com/Scroll-7/Fake-exposer/pull/1) — badge **Draft** |
 | Branche de la PR | `factory/60f0bb90-b295-4ed3-bf9b-405dea333ded/e87a5526-d65e-4236-8b2b-f496a296e0c2` |
-| Commit de la PR | `cbadcb4` (CI générée corrigée) |
+| Commit de la PR | `3c0f304` (CI générée + sécurité alignées) |
+| `main` du dépôt cible | `bf791dc` (CI corrigée + dépendances sécurisées) |
 | Run vert de référence | `098b26f5-58d3-4dce-a88c-6a37871a4aa1` |
 | Original | `C:\factory ai\workspaces\Fake-exposer` sur `main` (intact) |
 | Copie générée | `C:\factory ai\workspaces\Fake-exposer-upgraded` sur la branche de la PR |
@@ -87,11 +88,15 @@ Résultat réel : **4 tests passés, 0 échec**.
 | `Tests node:test (déterministes, hors ligne)` — workflow **généré** | ✅ success |
 | `Vérification syntaxique Python (local uniquement)` — workflow **généré** | ✅ success |
 | `Eval harness self-tests` — workflow d'origine | ✅ success |
-| `Node tests + lint` — workflow d'origine | ❌ failure (exit code 9) |
+| `Node tests + lint` — workflow d'origine | ✅ success |
 
-**Le job `Node tests + lint` échoue déjà sur `main`** (commit `06a7542`, vérifié via l'API GitHub). Ce n'est donc **pas** une régression du code généré. En local, `npm run lint` et `npm test` passent (224 tests). Je ne modifie pas le `ci.yml` d'origine : l'original doit rester intact.
+**4 checks verts sur 4.** Le job d'origine échouait auparavant (exit code 9) à cause de `NODE_OPTIONS=--experimental-test-coverage` : Node refuse ce drapeau dans `NODE_OPTIONS`. Correction appliquée sur `main` (`2eebf4b`) et alignée sur la branche de la PR : le drapeau est passé directement à `node --test --experimental-test-coverage test/*.test.js`. Aucun code applicatif n'a été modifié.
 
-**Conséquence pour la protection de branche** : n'exige pas `Node tests + lint` comme check requis tant que ce problème d'origine n'est pas réglé. Exige `tests-node` (workflow généré) à la place.
+**Sécurité** : `npm audit` signalait 10 vulnérabilités (dont 1 critique) dans les dépendances d'origine. Correctifs non cassants appliqués (`express` 4.22.3, `qs` 6.16.2, via `package-lock.json` uniquement) : **0 vulnérabilité** désormais. Vérifié en local : lint ✅, 224 tests ✅, audit ✅, et les 4 checks GitHub ✅.
+
+**Avertissement résiduel (informatif)** : GitHub signale que `actions/checkout@v4` et `actions/setup-node@v4` ciblent Node 20 et sont exécutés sous Node 24. C'est une dépréciation sans effet sur les checks ; les actions en v7 existent si tu veux les migrer plus tard.
+
+**Protection de branche** : tu peux maintenant exiger les 4 checks, y compris `Node tests + lint`.
 
 ## 4. Important : ce que la démo ne montre pas
 
