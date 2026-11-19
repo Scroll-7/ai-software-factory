@@ -2,7 +2,7 @@
 
 ## État
 
-Structure de l'application créée dans `factory-ui/` :
+✅ **Build vérifié le 2026-11-19** : Angular 21.2.26 + TypeScript 5.9.x sous Node 24.13.0, `npm run build` réussi, page servie sur 4200 sans erreur console, connexion locale testée dans le navigateur. Angular 22 a été écarté : il exige Node ≥ 24.15.0.
 
 - `package.json`, `angular.json`, `tsconfig*.json` : Angular 22 autonome, sans analyse, build local.
 - `src/app/app.component.ts` : formulaire de demande métier, connexion locale, suivi de l'exécution, décision humaine.
@@ -37,4 +37,4 @@ npm start
 
 Ouvre `http://127.0.0.1:4200`. L'API doit être démarrée sur `8081`.
 
-VERIFY : versions Angular 22.3 / TypeScript 6.0 vérifiées avec `npm view` le 2026-11-19 ; le build n'a pas encore été exécuté (installation en attente de ton accord).
+Les dépendances sont installées et `package-lock.json` est commité. Pour relancer : `npm start`, puis `npm run build` si besoin.

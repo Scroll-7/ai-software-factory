@@ -48,7 +48,7 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - [x] **Lot 2** — `rag-service` FastAPI (ingestion, chunking, embedding, retrieval, `/context/build`). Voir `docs/LOT2_NOTES.md`.
 - [x] **Lot 3** — boucle generate/check/retry réelle + `check-runner` Docker + normaliseur d'erreurs. **TC-01 vert le 2026-11-19.**
 - [ ] **Lot 4** — intégration GitHub (`ScmClient`, Draft PR, webhook, `.github/workflows/`). **Branche + push vérifiés ; URL de comparaison renvoyée (pas de `PFE_GITHUB_TOKEN`). `.github/workflows` cibles et webhook restent à faire.**
-- [ ] **Lot 5** — UI Angular (requête, specs, diff, revue, validation, suivi).
+- [x] **Lot 5** — UI Angular (requête, suivi du pipeline, URL de Draft PR, validation humaine). `npm run build` vert le 2026-11-19. Voir `docs/LOT5_NOTES.md`.
 - [ ] **Lot 6** — harnais d'évaluation (10–15 tâches, deux modèles, baseline manuelle).
 - [ ] **Lot 7** — docs françaises, rapport, mock defense (Parts 3–6 à livrer quand tu dis `continue`).
 
@@ -61,6 +61,13 @@ Mode de travail retenu : **je produis le code et les documents, tu valides par p
 - `/error` rendu public pour ne plus masquer les 500 en 403.
 - `POST /runs/{id}/execute` est devenu **asynchrone** : il répond `202 RUNNING` tout de suite et `GET /runs/{id}/execution` indique `RUNNING`, `AWAITING_REVIEW` (avec la PR) ou `FAILED` (avec l'erreur). Cela évite les timeouts HTTP pendant que le modèle 7B génère plusieurs fichiers.
 - Normalisations déterministes ajoutées : seuls les `source_uri` autorisés sont conservés en SPECS, et toute exigence non couverte est ajoutée au premier fichier du plan DESIGN. ASSUMPTION : nécessaire avec un modèle 7B local.
+
+## Lot 5 — vérifié le 2026-11-19
+
+- Angular **21.2.26** + TypeScript **5.9.x** (Angular 22 exige Node ≥ 24.15 ; la machine a Node 24.13).
+- `npm run build` → **BUILD SUCCESS** (bundle initial 208,62 kB). `package-lock.json` commité.
+- Serveur de dev sur `http://127.0.0.1:4200` → HTTP 200, rendu sans erreur console.
+- CORS vérifié (`Access-Control-Allow-Origin: http://127.0.0.1:4200`) et bouton « Se connecter » vérifié dans le navigateur (`POST /api/v1/auth/dev-token` → 200).
 
 ## TC-01 — vert le 2026-11-19 (preuve de bout en bout)
 
