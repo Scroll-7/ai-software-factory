@@ -49,8 +49,8 @@ factory:
       SPECS: 2
       DESIGN: 2
       CODE: 3
-      TESTS: 2
-      REVIEW: 2
+      TESTS: 3
+      REVIEW: 3
     max-repairs-per-run: 4
     llm-timeout-seconds: 120
   scm:

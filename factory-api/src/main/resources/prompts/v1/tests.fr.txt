@@ -19,5 +19,7 @@ FORMAT DE RÉPONSE OBLIGATOIRE — un seul objet JSON, AUCUN texte autour :
 
 EXIGENCES (JSON) : {{SPECS_JSON}}
 FICHIERS GÉNÉRÉS (résumé) : {{ARTIFACT_SUMMARY}}
+FICHIERS GÉNÉRÉS (contenu complet) :
+{{ALL_FILES}}
 
 {{REPAIR_NOTE}}

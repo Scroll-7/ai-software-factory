@@ -184,6 +184,7 @@ public class GenerationOrchestrator {
         testValues.put("SPECS_JSON", specs.toString());
         testValues.put("ARTIFACT_SUMMARY", generated.stream().map(Model.GeneratedFile::path)
                 .collect(Collectors.joining(", ")));
+        testValues.put("ALL_FILES", filesContext(generated));
         JsonNode tests = callStage("TESTS", runId, testValues, ctx, modelKey);
         List<Model.GeneratedFile> testFiles = toTestFiles(tests);
         generated.addAll(testFiles);
@@ -324,6 +325,15 @@ public class GenerationOrchestrator {
         } catch (Exception e) {
             return List.of("public/i18n/fr.json: JSON invalide (" + e.getMessage() + ")");
         }
+    }
+
+    private String filesContext(List<Model.GeneratedFile> files) {
+        StringBuilder sb = new StringBuilder();
+        for (Model.GeneratedFile f : files) {
+            sb.append("// FILE: ").append(f.path()).append("\n")
+                    .append(f.content()).append("\n\n");
+        }
+        return sb.toString();
     }
 
     private String contentOf(List<Model.GeneratedFile> files, String path) {
