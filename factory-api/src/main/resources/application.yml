@@ -26,7 +26,11 @@ spring:
       chat:
         options:
           model: qwen2.5-coder:7b
-          temperature: 0.0
+          # Le modèle 7B bouclait sur des jetons répétés ("token repeat limit reached").
+          # Pénalité de répétition + température faible mais non nulle pour casser la boucle.
+          repeat-penalty: 1.15
+          repeat-last-n: 64
+          temperature: 0.1
       embedding:
         options:
           model: bge-m3

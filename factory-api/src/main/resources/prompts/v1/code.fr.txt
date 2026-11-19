@@ -19,4 +19,7 @@ RÈGLES SPÉCIFIQUES
 - Remplis selfCheck honnêtement : chaque case sera revérifiée par le code.
 - Écris d'abord explanation (1 à 3 lignes), puis content.
 
+FORMAT DE RÉPONSE OBLIGATOIRE — un seul objet JSON, AUCUN texte autour :
+{"files":[{"path":"chemin/du/fichier","mode":"FULL_FILE","content":"contenu complet","requirementIds":["R1"],"explanation":"explication courte"}],"selfCheck":{"noExternalCalls":true,"noSecrets":true,"usesExistingFramework":true,"pathsExist":true,"noUnsafeApi":true},"notes":"notes courtes"}
+
 {{REPAIR_NOTE}}

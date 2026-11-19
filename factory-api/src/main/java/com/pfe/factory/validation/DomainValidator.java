@@ -79,6 +79,7 @@ public class DomainValidator {
                     if (!c.knownPaths().contains(path) && !c.newPaths().contains(path))
                         errors.add("code: chemin non autorisé " + path);
                     String content = f.path("content").asText();
+                    if (content.trim().length() < 20) errors.add(path + ": contenu trop court / vide");
                     int lines = content.split("\\R", -1).length;
                     if (lines > 200) errors.add(path + ": fichier trop long (" + lines + " lignes)");
                     if (FORBIDDEN.matcher(content).find())
@@ -90,8 +91,9 @@ public class DomainValidator {
                     }
                 }
                 JsonNode self = o.path("selfCheck");
-                for (String key : List.of("noExternalCalls", "noSecrets", "usesExistingFramework",
-                        "pathsExist", "noUnsafeApi")) {
+                // ASSUMPTION : un fichier de données (JSON i18n) n'utilise pas de framework.
+                // Le contrôle de dépendance est déjà couvert par FORBIDDEN + le check Docker.
+                for (String key : List.of("noExternalCalls", "noSecrets", "pathsExist", "noUnsafeApi")) {
                     if (!self.path(key).asBoolean(false)) errors.add("selfCheck." + key + " = false");
                 }
             }

@@ -10,6 +10,9 @@ RÈGLES SPÉCIFIQUES
 - Pour demo-hr-app : vérifie qu'un score et une explication sont produits ET que l'interface indique que la décision revient au recruteur.
 - Aucune assertion sur un attribut protégé.
 
+FORMAT DE RÉPONSE OBLIGATOIRE — un seul objet JSON, AUCUN texte autour :
+{"framework":"node:test","testFiles":[{"path":"test/i18n.test.js","content":"contenu du test","requirementIds":["R1"],"asserts":["assertion courte"]}],"coverage":{"requirementIdsCovered":["R1"]},"notes":"notes courtes"}
+
 EXIGENCES (JSON) : {{SPECS_JSON}}
 FICHIERS GÉNÉRÉS (résumé) : {{ARTIFACT_SUMMARY}}
 
